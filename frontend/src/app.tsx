@@ -1,46 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet } from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput } from "react-native";
 
 export default function App() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [newEvent, setNewEvent] = useState("");
 
-  // Cargar pedidos desde backend
+  // Cargar eventos desde backend
   useEffect(() => {
-    fetch("http://192.168.1.100:4000/api/orders") // 👈 cambia localhost por tu IP local si pruebas en celular
+    fetch("http://localhost:4000/api/events")
       .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error(err));
+      .then((data) => setEvents(data))
+      .catch((err) => console.error("Error cargando eventos:", err));
   }, []);
 
-  // Crear un pedido de prueba
-  const addOrder = () => {
-    fetch("http://192.168.1.100:4000/api/orders", { // igual aquí
+  // Crear un evento nuevo
+  const addEvent = () => {
+    if (!newEvent.trim()) return;
+    fetch("http://localhost:4000/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: Date.now(), description: "Nuevo pedido" }),
+      body: JSON.stringify({ description: newEvent }),
     })
       .then((res) => res.json())
-      .then((newOrder) => setOrders([...orders, newOrder]))
-      .catch((err) => console.error(err));
+      .then((event) => {
+        setEvents([...events, event]);
+        setNewEvent("");
+      })
+      .catch((err) => console.error("Error agregando evento:", err));
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pedidos:</Text>
+      <Text style={styles.title}>📌 Línea de tiempo - Ataques de Ansiedad</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Describe el evento..."
+        value={newEvent}
+        onChangeText={setNewEvent}
+      />
+
+      <Button title="Registrar Evento" onPress={addEvent} />
+
       <FlatList
-        data={orders}
+        data={events}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Text style={styles.item}>📦 {item.description}</Text>
+          <View style={styles.item}>
+            <Text style={styles.itemText}>🕒 {new Date(item.date).toLocaleString()}</Text>
+            <Text>{item.description}</Text>
+          </View>
         )}
       />
-      <Button title="Agregar pedido" onPress={addOrder} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  item: { fontSize: 16, marginVertical: 5 },
+  container: { flex: 1, padding: 20, marginTop: 50 },
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 20 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#aaa",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+  },
+  itemText: { fontWeight: "bold" },
 });
