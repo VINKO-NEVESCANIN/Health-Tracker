@@ -3,20 +3,35 @@ import { PrismaClient } from "./generated/prisma";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Crear un evento de prueba
+  // Crear un usuario (paciente)
+  const user = await prisma.user.create({
+    data: {
+      name: "Paciente de Prueba",
+      email: "paciente@example.com",
+      password: "123456", // ⚠️ en producción se cifra con bcrypt
+    },
+  });
+
+  console.log("✅ Usuario creado:", user);
+
+  // Crear un evento ligado al usuario
   const event = await prisma.event.create({
     data: {
-      description: "Primer ataque de ansiedad registrado",
-      intensity: 7,
-      //timestamp: new Date(), Incorporado de forma Default ya no es necesario
+      description: "Ataque de ansiedad leve",
+      intensity: 5,
+      userId: user.id, // 🔑 relación con User
     },
   });
 
   console.log("✅ Evento creado:", event);
 
-  // Leer todos los eventos
-  const events = await prisma.event.findMany();
-  console.log("📌 Eventos en la base de datos:", events);
+  // Traer usuario con sus eventos
+  const userWithEvents = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: { events: true },
+  });
+
+  console.log("📌 Usuario con eventos:", userWithEvents);
 }
 
 main()
