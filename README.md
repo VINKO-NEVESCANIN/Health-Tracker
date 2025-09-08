@@ -14,6 +14,7 @@ Aplicación móvil para registrar control de salud en un timeline (pacientes/doc
 - `docs/` → Diagramas y documentación
 
 ## 👥 Roles
+- Admin → Soporte de la aplicacion
 - Paciente → Registra eventos
 - Doctor → Visualiza timeline de pacientes
 
