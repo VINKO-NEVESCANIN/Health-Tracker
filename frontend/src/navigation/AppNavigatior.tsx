@@ -1,36 +1,36 @@
 import React from "react";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { Text, View } from "react-native";
+import InicioScreen from "../screens/InicioScreen";
+import RegistroScreen from "../screens/RegistroScreen";
+import DoctorScreen from "../screens/DoctorScreen";
+import PacienteScreen from "../screens/PacienteScreen";
 
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
-// Pantallas placeholder (las vas a reemplazar por componentes reales)
-function HomeScreen() {
-  return <View><Text>Pantalla de Inicio</Text></View>;
+// Tabs principales
+function MainTabs() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Inicio" component={InicioScreen} />
+      <Tab.Screen name="Registro" component={RegistroScreen} />
+      <Tab.Screen name="Doctor" component={DoctorScreen} />
+      <Tab.Screen name="Paciente" component={PacienteScreen} />
+    </Tab.Navigator>
+  );
 }
 
-function RegistroScreen() {
-  return <View><Text>Pantalla de Registro</Text></View>;
-}
-
-function DoctorScreen() {
-  return <View><Text>Pantalla del Doctor</Text></View>;
-}
-
-function PacienteScreen() {
-  return <View><Text>Pantalla del Paciente</Text></View>;
-}
-
+// Drawer (menú lateral con tres rayas)
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Inicio" component={HomeScreen} />
-        <Tab.Screen name="Registro" component={RegistroScreen} />
-        <Tab.Screen name="Doctor" component={DoctorScreen} />
-        <Tab.Screen name="Paciente" component={PacienteScreen} />
-      </Tab.Navigator>
+      <Drawer.Navigator>
+        <Drawer.Screen name="Principal" component={MainTabs} />
+        <Drawer.Screen name="Configuración" component={InicioScreen} />
+        <Drawer.Screen name="Perfil" component={PacienteScreen} />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 }
