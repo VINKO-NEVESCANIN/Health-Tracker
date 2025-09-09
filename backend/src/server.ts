@@ -52,3 +52,15 @@ app.get("/api/events", async (req, res) => {
 app.listen(4000, () => {
   console.log("✅ Backend corriendo en http://localhost:4000");
 });
+// Obtener todos los eventos
+app.get("/events", async (req, res) => {
+  try {
+    const events = await prisma.event.findMany({
+      orderBy: { timestamp: "desc" },
+    });
+    res.json(events);
+  } catch (error) {
+    console.error("Error obteniendo eventos:", error);
+    res.status(500).json({ error: "Error al obtener eventos" });
+  }
+});
