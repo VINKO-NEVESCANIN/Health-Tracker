@@ -14,7 +14,11 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.2.2",
-    "express": "^4.1.0"
+    "expo": "^53.0.22",
+    "expo-status-bar": "^2.2.3",
+    "express": "^4.1.0",
+    "react": "^19.1.1",
+    "react-native": "^0.81.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
