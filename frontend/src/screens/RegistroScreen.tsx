@@ -1,30 +1,37 @@
-import React, { useState } from "react";
-import { View, TextInput, Button, Text } from "react-native";
+import { useState } from "react";
+import { View, Text, TextInput, Button, Alert } from "react-native";
 
 export default function RegistroScreen() {
-  const [titulo, setTitulo] = useState("");
-  const [descripcion, setDescripcion] = useState("");
+  const [description, setDescription] = useState("");
 
-  const handleRegistro = () => {
-    console.log("Guardado:", { titulo, descripcion });
+  const handleSubmit = async () => {
+    if (!description.trim()) {
+      Alert.alert("Error", "La descripción no puede estar vacía");
+      return;
+    }
+
+    await fetch("http://localhost:4000/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description }),
+    });
+
+    Alert.alert("✅ Registro guardado");
+    setDescription("");
   };
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 18, marginBottom: 10 }}>📝 Registrar ataque</Text>
+    <View style={{ padding: 20 }}>
+      <Text style={{ fontSize: 22, fontWeight: "bold" }}>📝 Registrar Episodio</Text>
+
       <TextInput
-        placeholder="Título"
-        value={titulo}
-        onChangeText={setTitulo}
-        style={{ borderWidth: 1, marginVertical: 10, padding: 8, borderRadius: 8 }}
+        placeholder="Describe el episodio..."
+        value={description}
+        onChangeText={setDescription}
+        style={{ borderWidth: 1, marginVertical: 10, padding: 8 }}
       />
-      <TextInput
-        placeholder="Descripción"
-        value={descripcion}
-        onChangeText={setDescripcion}
-        style={{ borderWidth: 1, marginVertical: 10, padding: 8, borderRadius: 8 }}
-      />
-      <Button title="Guardar" onPress={handleRegistro} />
+
+      <Button title="Guardar" onPress={handleSubmit} />
     </View>
   );
 }
