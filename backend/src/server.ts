@@ -52,6 +52,23 @@ app.get("/api/events", async (req, res) => {
 app.listen(4000, () => {
   console.log("✅ Backend corriendo en http://localhost:4000");
 });
+// Crear evento
+app.post("/events", async (req, res) => {
+  const { description } = req.body;
+  try {
+    const event = await prisma.event.create({
+      data: {
+        description,
+        timestamp: new Date(),
+      },
+    });
+    res.json(event);
+  } catch (error) {
+    console.error("Error creando evento:", error);
+    res.status(500).json({ error: "Error al crear evento" });
+  }
+});
+
 // Obtener todos los eventos
 app.get("/events", async (req, res) => {
   try {
