@@ -34,7 +34,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 22, fontWeight: "bold" }}>📌 Línea de tiempo</Text>
+      <Text style={{ fontSize: 22, fontWeight: "bold" }}>📌 Línea de tiempo de los ataques</Text>
 
       <TextInput
         placeholder="Describe el evento"
