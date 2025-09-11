@@ -7,7 +7,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       name: "Paciente de Prueba",
-      email: "paciente@example.com",
+      email: "paciente@examples.com",
       password: "123456", // ⚠️ en producción se cifra con bcrypt
     },
   });
