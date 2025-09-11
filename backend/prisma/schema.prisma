@@ -34,3 +34,11 @@ model Event {
   userId Int
   user   User @relation(fields: [userId], references: [id])
 }
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+  name      String
+  age       Int
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
