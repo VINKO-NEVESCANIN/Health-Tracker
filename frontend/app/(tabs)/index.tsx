@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TextInput } from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput, Image } from "react-native";
+
 
 export default function IndexScreen() {
   const [events, setEvents] = useState<any[]>([]);
@@ -30,17 +31,26 @@ export default function IndexScreen() {
   };
 
   return (
+    
     <View style={styles.container}>
-      <Text style={styles.title}>📌 Línea de tiempo - Ataques de Ansiedad</Text>
+      <Image source={require("C:/Users/jotha/OneDrive/Documents/Health-Tracker/frontend/app/Icon/LoginIcon.png")} style={styles.LogIcon} />
+      <Text style={styles.title}>Neuromedy</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Describe el evento..."
+        placeholder="Usuario"
         value={newEvent}
         onChangeText={setNewEvent}
       />
 
-      <Button title="Registrar Evento" onPress={addEvent} />
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña"
+        value={newEvent}
+        onChangeText={setNewEvent}
+        />
+
+      <Button title="Iniciar Sesion" onPress={addEvent} />
 
       <FlatList
         data={events}
@@ -72,4 +82,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   itemText: { fontWeight: "bold" },
+
+ LogIcon: {flex: 1, padding: 20, marginTop: 50,
+  width: 100, height: 100, marginBottom: 20, alignItems: "center"}
 });
