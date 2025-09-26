@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
+
 const prisma = new PrismaClient();
 
 export const crearEvento = async (req: Request, res: Response) => {
@@ -25,3 +26,15 @@ export const crearEvento = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+export const listarEventos = async (req: Request, res: Response) => {
+  try {
+    const eventos = await prisma.event.findMany({
+      include: { user: true } // opcional: traer datos del usuario
+    });
+    res.json(eventos);
+  } catch (error) {
+    console.error("❌ Error al listar eventos:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
