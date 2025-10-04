@@ -6,7 +6,7 @@ export default function ApiTest() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch("http://192.168.100.35:4000/api/events"); 
+      const res = await fetch("http://10.0.2.2:4000/api/events"); 
       // ⚠️ Android Emulator usa 10.0.2.2 en vez de localhost
       // En físico, usa la IP de tu PC (ej: http://192.168.50.125:4000)
       const data = await res.json();

@@ -8,7 +8,7 @@ export default function IndexScreen() {
 
   // Cargar eventos desde backend
   useEffect(() => {
-    fetch("http://192.168.100.35:4000/api/events")
+    fetch("http://localhost:4000/api/events")
       .then((res) => res.json())
       .then((data) => setEvents(data))
       .catch((err) => console.error("Error cargando eventos:", err));
@@ -17,7 +17,7 @@ export default function IndexScreen() {
   // Crear un evento nuevo
   const addEvent = () => {
     if (!newEvent.trim()) return;
-    fetch("http://192.168.100.35:4000/api/events", {
+    fetch("http://localhost:4000/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ description: newEvent }),
