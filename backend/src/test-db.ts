@@ -1,4 +1,5 @@
-import { PrismaClient } from "./generated/prisma";
+import { PrismaClient } from '@prisma/client';
+
 
 const prisma = new PrismaClient();
 
@@ -7,7 +8,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       name: "Paciente de Prueba",
-      email: "paciente@examples.com",
+      email: "paciente@example.com",
       password: "123456", // ⚠️ en producción se cifra con bcrypt
     },
   });

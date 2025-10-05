@@ -1,19 +1,15 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import ordersRouter from "./routes/orders";
-
-dotenv.config();
+import eventosRoutes from "./routes/eventos.routes";
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
 
-//Rutas
-app.use("/api/orders", ordersRouter);
+// Rutas
+app.use("/api/eventos", eventosRoutes);
 
-app.listen(PORT, () => {
-    console.log(`✅ Backend corriendo en http://localhost:${PORT}`)
+app.listen(4000, () => {
+  console.log("🚀 Servidor corriendo en http://localhost:4000");
 });
