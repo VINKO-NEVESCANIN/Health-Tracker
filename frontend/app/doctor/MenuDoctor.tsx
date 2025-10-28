@@ -2,23 +2,41 @@ import React from "react";
 import {Image, Pressable, Text, Button, StyleSheet,View, Animated} from "react-native";
 
 export default function MenuDoctor() {
+const {  user } =  {}; // Aquí puedes obtener los parámetros de la ruta si es necesario
+
   return (
     <View style={styles.container}>
-      {Array.from({ length: 2 }).map((_, i) => (
+     
       <Pressable style={styles.StylePress} onPress={() => console.log("Logo presionado")}>
         <Image 
         source={require("../Icon/LoginIcon.png")} 
-        style={styles.BtnGestionCita}
+        style={styles.BtnIzquierda}
         />
-        <Text style={styles.itemText}>Gestion Cita</Text>
+        <Text style={styles.itemText}>Gestionar Cita</Text>
       </Pressable>
-      ))}      
+        
       <Pressable style={styles.StylePress} onPress={() => console.log("Logo presionado")}>
         <Image 
         source={require("../Icon/LoginIcon.png")} 
-        style={styles.BtnGestionCita}
+        style={styles.BtnIzquierda}
         />
-        <Text style={styles.itemText}>Gestion Cita</Text>
+        <Text style={styles.itemText}>Pacientes</Text>
+      </Pressable>
+
+      <Pressable style={styles.StylePress} onPress={() => console.log("Logo presionado")}>
+        <Image 
+        source={require("../Icon/LoginIcon.png")} 
+        style={styles.BtnIzquierda}
+        />
+        <Text style={styles.itemText}>Crisis Recientes</Text>
+      </Pressable>
+
+      <Pressable style={styles.StylePress} onPress={() => console.log("Logo presionado")}>
+        <Image 
+        source={require("../Icon/LoginIcon.png")} 
+        style={styles.BtnIzquierda}
+        />
+        <Text style={styles.itemText}>EpileptoGrama</Text>
       </Pressable>
               
         </View>
@@ -28,7 +46,17 @@ export default function MenuDoctor() {
   );
 }
 
-
+/*function BotonesNavegacion({Icono, Accion}: {Icono: any; Accion: () => void}) {
+return (
+    <Pressable style={styles.StylePress} onPress={Accion}>
+        <Image 
+        source={Icono} 
+        style={styles.BtnIzquierda}
+        />
+    </Pressable>
+);
+}
+*/
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, marginTop: 50,  flexDirection: 'row',
         flexWrap: 'wrap',
@@ -55,7 +83,7 @@ const styles = StyleSheet.create({
     
   },
 
-  BtnGestionCita:{
+  BtnIzquierda:{
      width: 100, 
      height: 100,
      marginBottom: 20,

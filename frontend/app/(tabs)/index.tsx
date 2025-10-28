@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TextInput, Image} from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput, Image, useNavigation} from "react-native";
+import { router, useRouter } from 'expo-router';
 
 export default function IndexScreen() {
   const [User, setUser] = useState("");
   const [Pass, setPass] = useState("");
+  const Router = useRouter();
   
   function lala() {
     console.log("Bienvenido:", User)
+    Router.push({
+      pathname:'../doctor/MenuDoctor',
+      params: { 
+        user: User,
+        pass: Pass
+       }
+    });
    }
 
 
@@ -33,7 +42,7 @@ export default function IndexScreen() {
       />
 
       <Button title="Iniciar Sesion" onPress={lala} />
-      <Text style={{alignSelf:"center", textDecorationLine:"underline"}}>
+      <Text onPress={lala} style={{alignSelf:"center", textDecorationLine:"underline"}}>
         Olvide Mi Contraseña...</Text>
     </View>
   );
