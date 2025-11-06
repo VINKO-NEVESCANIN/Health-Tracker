@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TextInput, Image, useNavigation} from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput, Image} from "react-native";
 import { router, useRouter } from 'expo-router';
 
 export default function IndexScreen() {
