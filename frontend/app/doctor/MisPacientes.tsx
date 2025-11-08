@@ -13,11 +13,13 @@ export default function Pacientes() {
       style={styles.fondo}
       resizeMode="cover"
     >
-    <View style={styles.container}>
+    <View style={styles.pantalla}>
 
 <FlatList
   data={items}
   keyExtractor={(item) => item.id}
+  contentContainerStyle={styles.contenedor}
+  columnWrapperStyle={styles.fila}
   renderItem={({ item }) => (
     <View style={styles.ListaPacientes}>
       <Text>{item.name}</Text>
@@ -28,8 +30,6 @@ export default function Pacientes() {
 
   )}
 />
-
-
       </View>
       </ImageBackground>
   );
@@ -74,21 +74,27 @@ const styles = StyleSheet.create({
   },
 
   ListaPacientes:{
-    borderWidth: 1,
-    borderColor: "#000000ff",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-
-  },
-
-  StylePress:{
     backgroundColor: "#C9B1FF",
     width: 120,
     height: 120,
     boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
     borderRadius: 20,
-    borderWidth: 2  
-  }
+    borderWidth: 2,
+
+  },
+   pantalla: {
+    flex: 1,
+    paddingTop: 40,
+  },
+  contenedor: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  fila: {
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  StylePress:{
+  } 
 
 });
