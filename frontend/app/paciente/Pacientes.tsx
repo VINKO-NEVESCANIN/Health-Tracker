@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Dimensions, useWindowDimensions} from "react-native";
+import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Dimensions, useWindowDimensions, Pressable} from "react-native";
 
 export default function Pacientes() {
     const items = [
@@ -32,12 +32,18 @@ export default function Pacientes() {
   keyExtractor={(item) => item.id}
   contentContainerStyle={styles.contenedor}
   renderItem={({ item }) => (
-    <View style={styles.ListaPacientes}>
-      <Text>{item.name}</Text>
-        <Text>{item.toto}</Text>
-        <Text>{item.tata}</Text>
-        <Text>{item.tete}</Text>
-    </View>
+    <Pressable
+          style={styles.ListaPacientes}
+          onPress={() => router.push({
+            pathname: '../../paciente/EditarPaciente',
+            params: { id: item.id }
+          })}
+        >
+          <Text>{item.name}</Text>
+          <Text>{item.toto}</Text>
+          <Text>{item.tata}</Text>
+          <Text>{item.tete}</Text>
+        </Pressable>
 
   )}
 />

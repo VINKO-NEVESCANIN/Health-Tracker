@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TextInput, Image} from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput, Image, ImageBackground} from "react-native";
 import { router, useRouter } from 'expo-router';
 
 export default function IndexScreen() {
@@ -20,6 +20,11 @@ export default function IndexScreen() {
 
 
   return (
+      <ImageBackground
+           source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+            style={styles.fondo}
+            resizeMode="cover"
+          >
     <View style={styles.container}>
 
       <Image
@@ -45,6 +50,7 @@ export default function IndexScreen() {
       <Text onPress={lala} style={{alignSelf:"center", textDecorationLine:"underline"}}>
         Olvide Mi Contraseña...</Text>
     </View>
+    </ImageBackground>
   );
 }
 
@@ -62,6 +68,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "#ddd",
+  },
+   fondo:{
+    flex: 1,
   },
   itemText: { fontWeight: "bold" },
 });
