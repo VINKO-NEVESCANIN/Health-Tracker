@@ -1,12 +1,17 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
+import pacientesRoutes from "./routes/pacientes";
+
+
+
 
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/pacientes", pacientesRoutes);
 
 // 🚀 Rutas de usuarios
 app.post("/api/users", async (req, res) => {
