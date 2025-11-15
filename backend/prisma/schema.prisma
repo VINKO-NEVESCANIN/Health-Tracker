@@ -1,5 +1,13 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
 generator client {
   provider = "prisma-client-js"
+  //output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -11,88 +19,26 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  password  String
-  role      String
+  password  String   // 🔒 en el futuro la encriptamos con bcrypt
   createdAt DateTime @default(now())
+  events    Event[]
+}
 
-  patients  Patient[]
+model Event {
+  id          Int      @id @default(autoincrement())
+  description String
+  intensity   Int
+  timestamp   DateTime @default(now())
+
+  // Relación con User
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }
 
 model Patient {
-  id           Int       @id @default(autoincrement())
-  nombre       String
-  apellido     String
-  edad         Int
-  telefono     String?
-  direccion    String?
-  email        String? @unique
-  createdAt    DateTime @default(now())
-
-  doctorId     Int
-  doctor       User      @relation(fields: [doctorId], references: [id])
-
-  medications  PatientMedication[]
-  studies      Study[]
-  vitals       Vital[]
-  crisis       Crisis[]
-  appointments Appointment[]
-}
-
-model Medication {
-  id           Int       @id @default(autoincrement())
-  nombre       String
-  descripcion  String?
-  patients     PatientMedication[]
-}
-
-model PatientMedication {
-  id           Int      @id @default(autoincrement())
-  patientId    Int
-  medicationId Int
-  dosis        String?
-  intervalo    String?
-
-  patient      Patient     @relation(fields: [patientId], references: [id])
-  medication   Medication  @relation(fields: [medicationId], references: [id])
-}
-
-model Study {
   id        Int      @id @default(autoincrement())
-  patientId Int
-  tipo      String
-  fecha     DateTime @default(now())
-  notas     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
-}
-
-model Vital {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  fecha     DateTime @default(now())
-  heartRate Int?
-  oxygen    Int?
-  temp      Float?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
-}
-
-model Crisis {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  fecha     DateTime @default(now())
-  notas     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
-}
-
-model Appointment {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  doctorId  Int
-  fecha     DateTime
-  notas     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
-  doctor    User    @relation(fields: [doctorId], references: [id])
+  name      String
+  age       Int
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
