@@ -4,10 +4,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// GET /api/pacientes
+// Obtener todos los pacientes
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const pacientes = await prisma.patient.findMany();
+    const pacientes = await prisma.patient.findMany(); // ✔️ Nombre correcto
     res.json(pacientes);
   } catch (error) {
     console.error("Error al obtener pacientes:", error);
@@ -15,14 +15,16 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/pacientes
+// Crear paciente
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { name, age, email } = req.body;
+
     const paciente = await prisma.patient.create({
       data: { name, age: Number(age), email },
     });
-    res.status(201).json(paciente);
+
+    res.json(paciente);
   } catch (error) {
     console.error("Error creando paciente:", error);
     res.status(500).json({ error: "Error al crear paciente" });

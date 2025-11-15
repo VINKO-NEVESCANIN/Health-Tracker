@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { View, ScrollView, RefreshControl, Text, Button } from "react-native";
 import { useRouter } from "expo-router";
+import { getPatients } from "../../_app.api";
 import { Card } from "../../components/Card";
-import { getPatients } from "../_app.api";
-import { theme } from "../styles/theme";
+import { theme } from "../../styles/theme";
 
 export default function PacientesList() {
   const [patients, setPatients] = useState([]);
@@ -28,7 +28,7 @@ export default function PacientesList() {
         <RefreshControl refreshing={refreshing} onRefresh={loadData} />
       }
     >
-      <Button title="➕ Añadir paciente" color={theme.colors.primary} onPress={() => router.push("/(tabs)/paciente/add")} />
+      <Button title="➕ Añadir paciente" color={theme.colors.primary} onPress={() => router.push("/(tabs)/pacientes/add")} />
       {patients.map((p) => (
         <Card key={p.id} title={p.name} subtitle={`Edad: ${p.age} años`} />
       ))}
