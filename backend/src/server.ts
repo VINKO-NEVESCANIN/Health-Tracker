@@ -13,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/pacientes", pacientesRoutes);
 
+
 // 🚀 Rutas de usuarios
 app.post("/api/users", async (req, res) => {
   try {
