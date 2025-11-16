@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import eventosRoutes from "./routes/eventos.routes";
-import pacientesRoutes from "./routes/pacientes";
 
 const app = express();
 
