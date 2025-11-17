@@ -1,0 +1,120 @@
+import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+// Crear paciente
+export const createPatient = async (req: any, res: Response) => {
+  try {
+    const { nombre, apellido, tipoEpilepsia, primeraCrisis, edad, telefono, direccion, enfermedades } = req.body;
+    const doctorId = req.userId;
+    if (!nombre) return res.status(400).json({ error: "nombre es requerido" });
+
+    const patient = await prisma.patient.create({
+      data: {
+        nombre,
+        apellido,
+        tipoEpilepsia,
+        primeraCrisis: primeraCrisis ? new Date(primeraCrisis) : undefined,
+        edad,
+        telefono,
+        direccion,
+        enfermedades,
+        doctorId,
+      },
+    });
+
+    res.status(201).json(patient);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error creando paciente" });
+  }
+};
+
+// Listar pacientes (del doctor)
+export const getPatients = async (req: any, res: Response) => {
+  try {
+    const doctorId = req.userId;
+    const search = (req.query.search as string) || "";
+    const patients = await prisma.patient.findMany({
+      where: {
+        doctorId,
+        OR: [
+          { nombre: { contains: search, mode: "insensitive" } },
+          { apellido: { contains: search, mode: "insensitive" } },
+        ],
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(patients);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo pacientes" });
+  }
+};
+
+export const getPatient = async (req: any, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const patient = await prisma.patient.findUnique({
+      where: { id },
+      include: { appointments: true, medications: { include: { medication: true } }, studies: true, vitals: true, crisis: true },
+    });
+    if (!patient) return res.status(404).json({ error: "Paciente no encontrado" });
+    res.json(patient);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo paciente" });
+  }
+};
+
+export const updatePatient = async (req: any, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const data = req.body;
+    const patient = await prisma.patient.update({
+      where: { id },
+      data,
+    });
+    res.json(patient);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error actualizando paciente" });
+  }
+};
+
+export const deletePatient = async (req: any, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.patient.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error borrando paciente" });
+  }
+};
+
+// timeline unificado (vitals, crisis, studies, appointments)
+export const getTimeline = async (req: any, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    const vitals = await prisma.vital.findMany({ where: { patientId: id } });
+    const crisis = await prisma.crisis.findMany({ where: { patientId: id } });
+    const studies = await prisma.study.findMany({ where: { patientId: id } });
+    const appointments = await prisma.appointment.findMany({ where: { patientId: id } });
+
+    // formatear y unir
+    const items = [
+      ...vitals.map(v => ({ type: "vital", date: v.fecha, data: v })),
+      ...crisis.map(c => ({ type: "crisis", date: c.fecha, data: c })),
+      ...studies.map(s => ({ type: "study", date: s.fecha, data: s })),
+      ...appointments.map(a => ({ type: "appointment", date: a.fecha, data: a })),
+    ].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    res.json(items);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo timeline" });
+  }
+};
