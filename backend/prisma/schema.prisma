@@ -15,42 +15,60 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String  //"doctor" | "patient"
-  createdAt DateTime @default(now())
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  password    String
+  role        String        // "doctor" | "patient" | "admin"
+  createdAt   DateTime      @default(now())
 
-  patients  Patient[] @relation("DoctorPatients")
-  appointments Appointment[]
+  patients    Patient[]     @relation("DoctorPatients")
+  appointments Appointment[] // citas como doctor
 }
 
 model Patient {
-  id           Int       @id @default(autoincrement())
-  nombre       String
-  apellido     String
-  edad         Int
-  telefono     String?
-  direccion    String?
-  email        String? @unique
-  createdAt    DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  apellido    String?
+  tipoEpilepsia String?
+  primeraCrisis DateTime?
+  totalCrisis  Int       @default(0)
+  enfermedades String?
+  edad        Int?
+  telefono    String?
+  direccion   String?
+  email       String?   @unique
+  createdAt   DateTime  @default(now())
 
-  doctorId     Int  
-  doctor       User      @relation("DoctorPatients",fields: [doctorId], references: [id])
+  doctorId    Int
+  doctor      User      @relation("DoctorPatients", fields: [doctorId], references: [id])
 
+  appointments Appointment[]
   medications  PatientMedication[]
   studies      Study[]
   vitals       Vital[]
   crisis       Crisis[]
-  appointments Appointment[]
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  fecha     DateTime
+  notas     String?
+  status    String   @default("scheduled") // scheduled|cancelled|done
+
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  doctor    User     @relation(fields: [doctorId], references: [id])
 }
 
 model Medication {
-  id           Int       @id @default(autoincrement())
-  nombre       String
-  descripcion  String?
-  patients     PatientMedication[]
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  createdAt   DateTime @default(now())
+
+  patients    PatientMedication[]
 }
 
 model PatientMedication {
@@ -59,9 +77,11 @@ model PatientMedication {
   medicationId Int
   dosis        String?
   intervalo    String?
+  startDate    DateTime?
+  endDate      DateTime?
 
-  patient      Patient     @relation(fields: [patientId], references: [id])
-  medication   Medication  @relation(fields: [medicationId], references: [id])
+  patient      Patient    @relation(fields: [patientId], references: [id])
+  medication   Medication @relation(fields: [medicationId], references: [id])
 }
 
 model Study {
@@ -70,6 +90,7 @@ model Study {
   tipo      String
   fecha     DateTime @default(now())
   notas     String?
+  fileUrl   String?  // si subes pdf / imagen
 
   patient   Patient @relation(fields: [patientId], references: [id])
 }
@@ -81,6 +102,7 @@ model Vital {
   heartRate Int?
   oxygen    Int?
   temp      Float?
+  notes     String?
 
   patient   Patient @relation(fields: [patientId], references: [id])
 }
@@ -89,18 +111,10 @@ model Crisis {
   id        Int      @id @default(autoincrement())
   patientId Int
   fecha     DateTime @default(now())
+  intensidad Int?
+  duracionMin Int?
   notas     String?
 
   patient   Patient @relation(fields: [patientId], references: [id])
 }
 
-model Appointment {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  doctorId  Int
-  fecha     DateTime
-  notas     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
-  doctor    User    @relation(fields: [doctorId], references: [id])
-}
