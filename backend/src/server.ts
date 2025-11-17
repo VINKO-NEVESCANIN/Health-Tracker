@@ -1,6 +1,6 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import cors from "cors";
+import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -8,13 +8,20 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-// 🚀 Rutas de usuarios
+// --- TEST ENDPOINT ---
+app.get("/", (req, res) => {
+  res.json({ message: "Backend funcionando correctamente" });
+});
+
+// --- Crear usuario (temporal para pruebas) ---
 app.post("/api/users", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+
     const user = await prisma.user.create({
-      data: { name, email, password },
+      data: { name, email, password, role },
     });
+
     res.json(user);
   } catch (error: any) {
     console.error("Error creando usuario:", error);
@@ -22,38 +29,18 @@ app.post("/api/users", async (req, res) => {
   }
 });
 
+// --- Obtener todos los usuarios ---
 app.get("/api/users", async (req, res) => {
-  const users = await prisma.user.findMany({ include: { events: true } });
-  res.json(users);
-});
-
-// 🚀 Rutas de eventos
-app.post("/api/events", async (req, res) => {
   try {
-    const { description, intensity, userId } = req.body;
-    const event = await prisma.event.create({
-      data: {
-        description,
-        intensity: Number(intensity),
-        userId: userId || null, // ✅ ahora puede ir vacío
-      },
-    });
-    res.json(event);
+    const users = await prisma.user.findMany();
+    res.json(users);
   } catch (error: any) {
-    console.error("Error creando evento:", error);
+    console.error("Error obteniendo usuarios:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get("/api/events", async (req, res) => {
-  const events = await prisma.event.findMany({
-    include: { user: true },
-    orderBy: { timestamp: "desc" },
-  });
-  res.json(events);
-});
-
-// 🔌 Iniciar servidor
-app.listen(4000, () => {
-  console.log("✅ Backend corriendo en http://localhost:4000");
+const PORT = 4000;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
 });
