@@ -19,7 +19,7 @@ export default function Pacientes() {
   data={items}
   keyExtractor={(item) => item.id}
   contentContainerStyle={styles.contenedor}
-  columnWrapperStyle={styles.fila}
+//  columnWrapperStyle={styles.fila}
   renderItem={({ item }) => (
     <View style={styles.ListaPacientes}>
       <Text>{item.name}</Text>
@@ -35,54 +35,24 @@ export default function Pacientes() {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, marginTop: 50,  flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 10,
-        },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#000000ff",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
 
   fondo:{
     flex: 1,
   },
 
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-  },
-  itemText: { 
-    fontWeight: "bold", 
-    marginTop: 97,
-    marginLeft: 20,
-    position: 'absolute',
-    
-  },
-
-  BtnIzquierda:{
-     width: 100, 
-     height: 100,
-     marginBottom: 20,
-     alignSelf: 'center',
-     borderRadius: 20,
-  },
-
   ListaPacientes:{
-    backgroundColor: "#C9B1FF",
-    width: 120,
+    backgroundColor: '#C9B1FF',
+    justifyContent: 'center',
+    width: '100%',
     height: 120,
+    padding: 10,
     boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
     borderRadius: 20,
     borderWidth: 2,
+    marginBottom: 20,
 
   },
-   pantalla: {
+  pantalla: {
     flex: 1,
     paddingTop: 40,
   },
@@ -94,7 +64,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  StylePress:{
-  } 
+  input: {
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: "#000000ff",
+    padding: 12,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: '#ffffff',
+    alignSelf: 'center',
+    width: '90%',
+  },
+  
 
 });
