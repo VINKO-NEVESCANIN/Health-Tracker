@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/db";
 
-const prisma = new PrismaClient();
-
-// Crear paciente
 export const createPatient = async (req: any, res: Response) => {
   try {
     const {
@@ -19,10 +16,7 @@ export const createPatient = async (req: any, res: Response) => {
     } = req.body;
 
     const doctorId = req.userId;
-
-    if (!firstName) {
-      return res.status(400).json({ error: "firstName requerido" });
-    }
+    if (!firstName) return res.status(400).json({ error: "firstName requerido" });
 
     const patient = await prisma.patient.create({
       data: {
@@ -38,7 +32,6 @@ export const createPatient = async (req: any, res: Response) => {
         doctorId,
       },
     });
-
     res.status(201).json(patient);
   } catch (err: any) {
     console.error(err);
@@ -46,7 +39,6 @@ export const createPatient = async (req: any, res: Response) => {
   }
 };
 
-// Listar pacientes
 export const getPatients = async (req: any, res: Response) => {
   try {
     const doctorId = req.userId;
@@ -62,7 +54,6 @@ export const getPatients = async (req: any, res: Response) => {
       },
       orderBy: { createdAt: "desc" },
     });
-
     res.json(patients);
   } catch (err: any) {
     console.error(err);
@@ -70,11 +61,9 @@ export const getPatients = async (req: any, res: Response) => {
   }
 };
 
-// Obtener paciente por ID
 export const getPatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-
     const patient = await prisma.patient.findUnique({
       where: { id },
       include: {
@@ -85,9 +74,7 @@ export const getPatient = async (req: any, res: Response) => {
         crisis: true,
       },
     });
-
     if (!patient) return res.status(404).json({ error: "Paciente no encontrado" });
-
     res.json(patient);
   } catch (err: any) {
     console.error(err);
@@ -95,17 +82,11 @@ export const getPatient = async (req: any, res: Response) => {
   }
 };
 
-// Actualizar paciente
 export const updatePatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
     const data = req.body;
-
-    const patient = await prisma.patient.update({
-      where: { id },
-      data,
-    });
-
+    const patient = await prisma.patient.update({ where: { id }, data });
     res.json(patient);
   } catch (err: any) {
     console.error(err);
@@ -113,13 +94,10 @@ export const updatePatient = async (req: any, res: Response) => {
   }
 };
 
-// Borrar paciente
 export const deletePatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-
     await prisma.patient.delete({ where: { id } });
-
     res.json({ ok: true });
   } catch (err: any) {
     console.error(err);
@@ -127,7 +105,6 @@ export const deletePatient = async (req: any, res: Response) => {
   }
 };
 
-// Timeline
 export const getTimeline = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -142,7 +119,7 @@ export const getTimeline = async (req: any, res: Response) => {
       ...crisis.map(c => ({ type: "crisis", date: c.date, data: c })),
       ...studies.map(s => ({ type: "study", date: s.date, data: s })),
       ...appointments.map(a => ({ type: "appointment", date: a.date, data: a })),
-    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    ].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     res.json(items);
   } catch (err: any) {

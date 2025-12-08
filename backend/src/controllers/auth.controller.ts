@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/db";
 import jwt from "jsonwebtoken";
 import { hashPassword, comparePassword } from "../utils/hash";
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "secret_dev";
 
 export const register = async (req: Request, res: Response) => {
@@ -43,19 +42,5 @@ export const login = async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: "Error en login" });
-  }
-};
-
-export const me = async (req: any, res: Response) => {
-  try {
-    const userId = req.userId;
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, name: true, email: true, role: true, createdAt: true },
-    });
-    res.json({ user });
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo usuario" });
   }
 };

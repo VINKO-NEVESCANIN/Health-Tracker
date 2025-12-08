@@ -1,22 +1,12 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+import verifyToken from "../middleware/auth";
+import { allowRoles } from "../middleware/roles";
+import { createCrisis, listCrisis } from "../controllers/crisis.controller";
 
 const router = Router();
-const prisma = new PrismaClient();
 
-router.post("/", async (req, res) => {
-  const { patientId, intensity, durationMin, notes } = req.body;
-
-  const crisis = await prisma.crisis.create({
-    data: {
-      patientId,
-      intensity,
-      durationMin,
-      notes
-    }
-  });
-
-  res.json(crisis);
-});
+router.use(verifyToken);
+router.post("/", allowRoles("doctor","admin"), createCrisis);
+router.get("/patient/:id", allowRoles("doctor","admin","patient"), listCrisis);
 
 export default router;

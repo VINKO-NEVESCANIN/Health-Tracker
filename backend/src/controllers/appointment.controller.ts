@@ -1,17 +1,11 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/db";
 
-const prisma = new PrismaClient();
-
-// Crear cita
 export const createAppointment = async (req: any, res: Response) => {
   try {
     const { patientId, date, notes } = req.body;
     const doctorId = req.userId;
-
-    if (!patientId || !date) {
-      return res.status(400).json({ error: "Campos faltantes" });
-    }
+    if (!patientId || !date) return res.status(400).json({ error: "Campos faltantes" });
 
     const appointment = await prisma.appointment.create({
       data: {
@@ -21,7 +15,6 @@ export const createAppointment = async (req: any, res: Response) => {
         notes,
       },
     });
-
     res.status(201).json(appointment);
   } catch (err: any) {
     console.error(err);
@@ -29,16 +22,10 @@ export const createAppointment = async (req: any, res: Response) => {
   }
 };
 
-// Citas del doctor
 export const getAppointments = async (req: any, res: Response) => {
   try {
     const doctorId = req.userId;
-
-    const appts = await prisma.appointment.findMany({
-      where: { doctorId },
-      orderBy: { date: "desc" },
-    });
-
+    const appts = await prisma.appointment.findMany({ where: { doctorId }, orderBy: { date: "desc" } });
     res.json(appts);
   } catch (err: any) {
     console.error(err);
@@ -46,16 +33,10 @@ export const getAppointments = async (req: any, res: Response) => {
   }
 };
 
-// Citas por paciente
 export const getAppointmentsByPatient = async (req: any, res: Response) => {
   try {
     const patientId = Number(req.params.id);
-
-    const appts = await prisma.appointment.findMany({
-      where: { patientId },
-      orderBy: { date: "desc" },
-    });
-
+    const appts = await prisma.appointment.findMany({ where: { patientId }, orderBy: { date: "desc" } });
     res.json(appts);
   } catch (err: any) {
     console.error(err);
@@ -63,21 +44,14 @@ export const getAppointmentsByPatient = async (req: any, res: Response) => {
   }
 };
 
-// Actualizar cita
 export const updateAppointment = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
     const { date, notes, status } = req.body;
-
     const appt = await prisma.appointment.update({
       where: { id },
-      data: {
-        date: date ? new Date(date) : undefined,
-        notes,
-        status,
-      },
+      data: { date: date ? new Date(date) : undefined, notes, status },
     });
-
     res.json(appt);
   } catch (err: any) {
     console.error(err);
@@ -85,13 +59,10 @@ export const updateAppointment = async (req: any, res: Response) => {
   }
 };
 
-// Borrar cita
 export const deleteAppointment = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-
     await prisma.appointment.delete({ where: { id } });
-
     res.json({ ok: true });
   } catch (err: any) {
     console.error(err);

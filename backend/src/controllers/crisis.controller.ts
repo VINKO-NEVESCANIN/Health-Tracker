@@ -1,24 +1,15 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../config/db";
 
 export const createCrisis = async (req: Request, res: Response) => {
   try {
-    const { patientId, intensity, durationMin, notes } = req.body;
-
+    const { patientId, intensity, durationMin, notes, date } = req.body;
     const crisis = await prisma.crisis.create({
-      data: {
-        patientId,
-        intensity,
-        durationMin,
-        notes
-      }
+      data: { patientId, intensity, durationMin, notes, date: date ? new Date(date) : undefined },
     });
-
     res.status(201).json(crisis);
-  } catch (error) {
-    console.error(error);
+  } catch (err: any) {
+    console.error(err);
     res.status(500).json({ error: "Error creando crisis" });
   }
 };
@@ -26,15 +17,10 @@ export const createCrisis = async (req: Request, res: Response) => {
 export const listCrisis = async (req: Request, res: Response) => {
   try {
     const patientId = Number(req.params.id);
-
-    const crisis = await prisma.crisis.findMany({
-      where: { patientId },
-      orderBy: { date: "desc" }
-    });
-
+    const crisis = await prisma.crisis.findMany({ where: { patientId }, orderBy: { date: "desc" } });
     res.json(crisis);
-  } catch (error) {
-    console.error(error);
+  } catch (err: any) {
+    console.error(err);
     res.status(500).json({ error: "Error obteniendo crisis" });
   }
 };
