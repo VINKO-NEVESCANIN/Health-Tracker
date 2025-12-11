@@ -5,19 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function EditarPaciente() {
 
-  type Txtinput={
-  id: number;
-  valor: string;
-  };
-  // Text de inputs normales
-
-  const Txtinputs: Txtinput[] = [
-    { id: 1, valor: 'Nombre' },
-    { id: 2, valor: 'Primer Apellido' },
-    { id: 3, valor: 'Segundo Apellido' },
-    { id: 4, valor: 'Altura' },
-    { id: 5, valor: 'Peso' },
-  ]
+  const labels = ['Nombre', 'Primer Apellido', 'Segundo Apellido', 'Altura', 'Peso'];
 
   // 5 inputs normales
   const [inputs, setInputs] = useState(Array(5).fill(''));
@@ -55,8 +43,34 @@ export default function EditarPaciente() {
       <ScrollView contentContainerStyle={styles.contenedor}>
       <Text style={styles.titulo}>Editar Usuario</Text>
 
-      {/* 5 inputs normales */}
+       <View style={styles.contenedor}>
+      {labels.map((label, index) => (
+        <View key={index} style={styles.item}>
+          {/* Texto como label */}
+          <Text style={styles.label}>{label}</Text>
+
+          {/* Input asociado */}
+          <TextInput
+            value={inputs[index]}
+            onChangeText={(text) => {
+              const nuevos = [...inputs];
+              nuevos[index] = text;
+              setInputs(nuevos);
+            }}
+            placeholder={`Escribe ${label}`}
+            placeholderTextColor="#888"
+            style={styles.input}
+          />
+        </View>
+      ))}
+    </View>
+
+      {/* 5 inputs normales
       {inputs.map((valor, index) => (
+        <View>
+          <Text>
+            {Txtinputs}
+          </Text>
         <TextInput
           key={index}
           value={valor}
@@ -69,10 +83,11 @@ export default function EditarPaciente() {
           placeholderTextColor="#888"
           style={styles.input}
         />
+        </View>
       ))}
-
+    */}
       {/* Selector Genero */}
-      <Text style={styles.label}>Genero:</Text>
+      <Text>Genero:</Text>
       <Picker selectedValue={opcion1} onValueChange={setOpcion1}>
         <Picker.Item label="Masculino" value="Masculino" />
         <Picker.Item label="Femenino" value="Femenino" />
@@ -80,7 +95,7 @@ export default function EditarPaciente() {
       </Picker>
 
       {/* Fecha 1 */}
-      <Text style={styles.label}>Fecha 1: {fecha1.toLocaleDateString()}</Text>
+      <Text>Fecha 1: {fecha1.toLocaleDateString()}</Text>
       <Button title="Seleccionar Fecha 1" onPress={() => setShowFecha1(true)} />
       <DateTimePickerModal
         isVisible={showFecha1}
@@ -93,7 +108,7 @@ export default function EditarPaciente() {
       />
 
       {/* Fecha 2 */}
-      <Text style={styles.label}>Fecha 2: {fecha2.toLocaleDateString()}</Text>
+      <Text>Fecha 2: {fecha2.toLocaleDateString()}</Text>
       <Button title="Seleccionar Fecha 2" onPress={() => setShowFecha2(true)} />
       <DateTimePickerModal
         isVisible={showFecha2}
@@ -105,7 +120,7 @@ export default function EditarPaciente() {
         onCancel={() => setShowFecha2(false)}
       />
       {/* Selector 1 */}
-      <Text style={styles.label}>Opción 2:</Text>
+      <Text>Opción 2:</Text>
       <Picker selectedValue={opcion2} onValueChange={setOpcion2}>
         <Picker.Item label="Valor X" value="X" />
         <Picker.Item label="Valor Y" value="Y" />
@@ -171,7 +186,7 @@ export default function EditarPaciente() {
     borderRadius: 5,
     backgroundColor: '#ffffff',
     alignSelf: 'center',
-    width: '90%',
+    width: '95%',
   },
   contenedor2: {
     padding: 20,
@@ -199,7 +214,14 @@ export default function EditarPaciente() {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-  }
-  
+  },
+  label: {
+    fontSize: 16,
+    paddingLeft: 10,
+    marginBottom: 4,
+  },
+  item: {
+
+  },
 
 });

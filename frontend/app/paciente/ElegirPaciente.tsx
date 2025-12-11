@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Dimensions, useWindowDimensions, Pressable} from "react-native";
 
@@ -9,8 +9,6 @@ export default function Pacientes() {
   { id: '3', name: 'Paciente 1', toto: 'hola', tata: 'adios', tete: 'saludos' },
   { id: '4', name: 'Paciente 1', toto: 'hola', tata: 'adios', tete: 'saludos' }
   ]
-  const params = useLocalSearchParams();
-  const condition = params.condition;
   const [User, setUser] = useState("");
 //  const { Width } = useWindowDimensions();
   return (
@@ -18,8 +16,8 @@ export default function Pacientes() {
      source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
       style={styles.fondo}
       resizeMode="cover"
-    >   
-      <View style={styles.pantalla}>
+    >
+    <View style={styles.pantalla}>
 
 <TextInput
         style={styles.input}
@@ -34,21 +32,7 @@ export default function Pacientes() {
   keyExtractor={(item) => item.id}
   contentContainerStyle={styles.contenedor}
   renderItem={({ item }) => (
-    condition === '1' ? (
     <Pressable
-          style={styles.ListaPacientes}
-          onPress={() => router.push({
-            pathname: '../../paciente/EditarCita',
-            params: { id: item.id }
-          })}
-        >
-          <Text>{item.name}</Text>
-          <Text>{item.toto}</Text>
-          <Text>{item.tata}</Text>
-          <Text>{item.tete}</Text>
-        </Pressable>
-        ) : (
-        <Pressable
           style={styles.ListaPacientes}
           onPress={() => router.push({
             pathname: '../../paciente/EditarPaciente',
@@ -60,12 +44,10 @@ export default function Pacientes() {
           <Text>{item.tata}</Text>
           <Text>{item.tete}</Text>
         </Pressable>
-        )
-    )}
 
+  )}
 />
       </View>
-      
       </ImageBackground>
   );
 }
