@@ -18,7 +18,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// RUTAS
+// RUTAS PRINCIPALES
 app.use("/auth", authRoutes);
 app.use("/patients", patientRoutes);
 app.use("/appointments", appointmentRoutes);
@@ -28,6 +28,14 @@ app.use("/studies", studyRoutes);
 app.use("/vitals", vitalRoutes);
 app.use("/crisis", crisisRoutes);
 
+
+// 🔥 RUTA DE TESTEO / HOME
+app.get("/", (_req, res) => {
+  res.send("API Health Tracker funcionando 🚀");
+});
+
+
+// INICIAR SERVIDOR
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
