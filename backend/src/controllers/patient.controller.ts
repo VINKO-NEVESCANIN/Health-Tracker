@@ -17,9 +17,7 @@ export const createPatient = async (req: any, res: Response) => {
     } = req.body;
 
     const doctorId = req.userId;
-
-    if (!firstName)
-      return res.status(400).json({ error: "firstName es requerido" });
+    if (!firstName) return res.status(400).json({ error: "firstName es requerido" });
 
     const patient = await prisma.patient.create({
       data: {
@@ -38,11 +36,11 @@ export const createPatient = async (req: any, res: Response) => {
 
     res.status(201).json(patient);
   } catch (err: any) {
+    console.error(err);
     res.status(500).json({ error: "Error creando paciente" });
   }
 };
 
-// listar pacientes por doctor
 export const getPatients = async (req: any, res: Response) => {
   try {
     const doctorId = req.userId;
@@ -60,12 +58,12 @@ export const getPatients = async (req: any, res: Response) => {
     });
 
     res.json(patients);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error obteniendo pacientes" });
   }
 };
 
-// obtener un paciente
 export const getPatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -80,40 +78,35 @@ export const getPatient = async (req: any, res: Response) => {
       },
     });
 
-    if (!patient)
-      return res.status(404).json({ error: "Paciente no encontrado" });
-
+    if (!patient) return res.status(404).json({ error: "Paciente no encontrado" });
     res.json(patient);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error obteniendo paciente" });
   }
 };
 
-// update
 export const updatePatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-
     const patient = await prisma.patient.update({
       where: { id },
       data: req.body,
     });
-
     res.json(patient);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error actualizando paciente" });
   }
 };
 
-// delete
 export const deletePatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-
     await prisma.patient.delete({ where: { id } });
-
     res.json({ ok: true });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error borrando paciente" });
   }
 };

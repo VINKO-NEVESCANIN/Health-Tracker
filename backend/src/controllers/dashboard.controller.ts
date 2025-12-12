@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prisma } from "../config/db";
+import prisma from "../config/db";
 
 export const getDashboardStats = async (_req: Request, res: Response) => {
   const [patients, appointments, medications] = await Promise.all([

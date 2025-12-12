@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prisma } from "../config/db";
+import prisma from "../config/db";
 
 export const getOrders = async (_req: Request, res: Response) => {
   res.json(await prisma.order.findMany());

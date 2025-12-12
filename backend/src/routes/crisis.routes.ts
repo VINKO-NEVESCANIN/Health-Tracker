@@ -1,8 +1,5 @@
 import { Router } from "express";
-import { createEvent } from "../controllers/event.controller";
-
+import { createCrisis } from "../controllers/crisis.controller";
 const router = Router();
-
-router.post("/", createEvent);
-
+router.post("/", createCrisis);
 export default router;
