@@ -1,13 +1,28 @@
 import { Request, Response } from "express";
+import { prisma } from "../config/db";
 
-let orders: any[] = []; //Temporal, luego usar DB
-
-export const getOrders = (req: Request, res: Response) => {
-    res.json(orders);
+export const getOrders = async (_req: Request, res: Response) => {
+  res.json(await prisma.order.findMany());
 };
 
-export const createOrder = (req: Request, res: Response) => {
-    const newOrder = req.body;
-    orders.push(newOrder);
-    res.status(201).json(newOrder);
+export const getOrder = async (req: Request, res: Response) => {
+  res.json(await prisma.order.findUnique({
+    where: { id: Number(req.params.id) }
+  }));
+};
+
+export const createOrder = async (req: Request, res: Response) => {
+  res.json(await prisma.order.create({ data: req.body }));
+};
+
+export const updateOrder = async (req: Request, res: Response) => {
+  res.json(await prisma.order.update({
+    where: { id: Number(req.params.id) },
+    data: req.body
+  }));
+};
+
+export const deleteOrder = async (req: Request, res: Response) => {
+  await prisma.order.delete({ where: { id: Number(req.params.id) } });
+  res.json({ message: "Order deleted" });
 };

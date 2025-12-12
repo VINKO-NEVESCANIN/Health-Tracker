@@ -1,26 +1,23 @@
+// src/controllers/crisis.controller.ts
 import { Request, Response } from "express";
-import { prisma } from "../config/db";
+import prisma from "../config/db";
 
 export const createCrisis = async (req: Request, res: Response) => {
   try {
-    const { patientId, intensity, durationMin, notes, date } = req.body;
-    const crisis = await prisma.crisis.create({
-      data: { patientId, intensity, durationMin, notes, date: date ? new Date(date) : undefined },
-    });
-    res.status(201).json(crisis);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error creando crisis" });
-  }
-};
+    const { patientId, date, duration, intensity, notes } = req.body;
 
-export const listCrisis = async (req: Request, res: Response) => {
-  try {
-    const patientId = Number(req.params.id);
-    const crisis = await prisma.crisis.findMany({ where: { patientId }, orderBy: { date: "desc" } });
-    res.json(crisis);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo crisis" });
+    const crisis = await prisma.crisis.create({
+      data: {
+        patientId,
+        date: new Date(date),
+        duration,
+        intensity,
+        notes,
+      },
+    });
+
+    res.status(201).json(crisis);
+  } catch {
+    res.status(500).json({ error: "Error registrando crisis" });
   }
 };

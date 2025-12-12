@@ -1,40 +1,28 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/db";
 
-const prisma = new PrismaClient();
-
-// Obtener perfil del doctor autenticado
-export const getDoctorProfile = async (req: any, res: Response) => {
-  try {
-    const doctorId = req.userId;
-
-    const doctor = await prisma.user.findUnique({
-      where: { id: doctorId },
-      select: { id: true, name: true, email: true, role: true, createdAt: true }
-    });
-
-    if (!doctor) return res.status(404).json({ error: "Doctor no encontrado" });
-
-    res.json({ doctor });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error obteniendo doctor" });
-  }
+export const getDoctors = async (_req: Request, res: Response) => {
+  res.json(await prisma.doctor.findMany());
 };
 
-// Listar pacientes del doctor
-export const getDoctorPatients = async (req: any, res: Response) => {
-  try {
-    const doctorId = req.userId;
+export const getDoctor = async (req: Request, res: Response) => {
+  res.json(await prisma.doctor.findUnique({
+    where: { id: Number(req.params.id) }
+  }));
+};
 
-    const patients = await prisma.patient.findMany({
-      where: { doctorId },
-      orderBy: { createdAt: "desc" }
-    });
+export const createDoctor = async (req: Request, res: Response) => {
+  res.json(await prisma.doctor.create({ data: req.body }));
+};
 
-    res.json(patients);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error obteniendo pacientes del doctor" });
-  }
+export const updateDoctor = async (req: Request, res: Response) => {
+  res.json(await prisma.doctor.update({
+    where: { id: Number(req.params.id) },
+    data: req.body
+  }));
+};
+
+export const deleteDoctor = async (req: Request, res: Response) => {
+  await prisma.doctor.delete({ where: { id: Number(req.params.id) } });
+  res.json({ message: "Doctor deleted" });
 };

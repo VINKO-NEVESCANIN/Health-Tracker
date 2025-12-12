@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/db";
 
-export const dashboardStats = async (req: any, res: Response) => {
-  try {
-    const doctorId = req.userId;
-    const totalPatients = await prisma.patient.count({ where: { doctorId } });
-    const totalAppointments = await prisma.appointment.count({ where: { doctorId } });
-    const totalCrisis = await prisma.crisis.count({ where: { patient: { doctorId } } });
+export const getDashboardStats = async (_req: Request, res: Response) => {
+  const [patients, appointments, medications] = await Promise.all([
+    prisma.patient.count(),
+    prisma.appointment.count(),
+    prisma.medication.count(),
+  ]);
 
-    res.json({ totalPatients, totalAppointments, totalCrisis });
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo estadísticas" });
-  }
+  res.json({
+    totalPatients: patients,
+    totalAppointments: appointments,
+    totalMedications: medications,
+  });
 };

@@ -1,3 +1,4 @@
+// src/utils/hash.ts
 import bcrypt from "bcrypt";
 
 export const hashPassword = async (password: string) => {
@@ -8,7 +9,6 @@ export const hashPassword = async (password: string) => {
 export const comparePassword = async (password: string, hash: string) => {
   return bcrypt.compare(password, hash);
 };
-
 
 //import bcrypt from "bcrypt";
 //

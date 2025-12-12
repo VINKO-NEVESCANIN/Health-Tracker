@@ -1,55 +1,59 @@
 import { Request, Response } from "express";
-import { prisma } from "../config/db";
+import prisma from "../config/db";
 
 export const createMedication = async (req: Request, res: Response) => {
   try {
-    const { name, description } = req.body;
-    if (!name) return res.status(400).json({ error: "name requerido" });
-    const med = await prisma.medication.create({ data: { name, description } });
-    res.status(201).json(med);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error creando medicamento" });
-  }
-};
-
-export const listMedications = async (_req: Request, res: Response) => {
-  try {
-    const meds = await prisma.medication.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(meds);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo medicamentos" });
-  }
-};
-
-export const assignMedication = async (req: Request, res: Response) => {
-  try {
-    const { patientId, medicationId, dose, interval, startDate, endDate } = req.body;
-    const assigned = await prisma.patientMedication.create({
-      data: {
-        patientId,
-        medicationId,
-        dose,
-        interval,
-        startDate: startDate ? new Date(startDate) : undefined,
-        endDate: endDate ? new Date(endDate) : undefined,
-      },
+    const med = await prisma.medication.create({
+      data: req.body
     });
-    res.status(201).json(assigned);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error asignando medicamento" });
+    res.json(med);
+  } catch (error) {
+    res.status(500).json({ error: "Error creating medication" });
   }
 };
 
-export const listPatientMedications = async (req: Request, res: Response) => {
+export const getMedications = async (req: Request, res: Response) => {
   try {
-    const patientId = Number(req.params.id);
-    const meds = await prisma.patientMedication.findMany({ where: { patientId }, include: { medication: true } });
+    const meds = await prisma.medication.findMany();
     res.json(meds);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo medicamentos del paciente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching medications" });
+  }
+};
+
+export const getMedication = async (req: Request, res: Response) => {
+  try {
+    const med = await prisma.medication.findUnique({
+      where: { id: Number(req.params.id) }
+    });
+
+    if (!med) return res.status(404).json({ error: "Medication not found" });
+
+    res.json(med);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching medication" });
+  }
+};
+
+export const updateMedication = async (req: Request, res: Response) => {
+  try {
+    const med = await prisma.medication.update({
+      where: { id: Number(req.params.id) },
+      data: req.body
+    });
+    res.json(med);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating medication" });
+  }
+};
+
+export const deleteMedication = async (req: Request, res: Response) => {
+  try {
+    await prisma.medication.delete({
+      where: { id: Number(req.params.id) }
+    });
+    res.json({ message: "Medication deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting medication" });
   }
 };
