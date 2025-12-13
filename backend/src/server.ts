@@ -2,6 +2,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import morgan from "morgan";
+
+import logger from "./config/logger";
 
 import authRoutes from "./routes/auth.routes";
 import patientRoutes from "./routes/patient.routes";
@@ -15,10 +18,21 @@ import crisisRoutes from "./routes/crisis.routes";
 dotenv.config();
 
 const app = express();
+
+// 🔹 Middlewares base
 app.use(cors());
 app.use(express.json());
 
-// RUTAS PRINCIPALES
+// 🔥 Morgan → Winston
+app.use(
+  morgan("dev", {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+);
+
+// 🔹 Rutas principales
 app.use("/auth", authRoutes);
 app.use("/patients", patientRoutes);
 app.use("/appointments", appointmentRoutes);
@@ -28,16 +42,14 @@ app.use("/studies", studyRoutes);
 app.use("/vitals", vitalRoutes);
 app.use("/crisis", crisisRoutes);
 
-
-// 🔥 RUTA DE TESTEO / HOME
+// 🔹 Ruta raíz
 app.get("/", (_req, res) => {
   res.send("API Health Tracker funcionando 🚀");
 });
 
-
-// INICIAR SERVIDOR
+// 🔹 Servidor
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  logger.info(`Servidor corriendo en http://localhost:${PORT}`);
 });
