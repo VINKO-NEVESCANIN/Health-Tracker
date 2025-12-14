@@ -14,6 +14,8 @@ import patientMedicationRoutes from "./routes/patientMedication.routes";
 import studyRoutes from "./routes/study.routes";
 import vitalRoutes from "./routes/vital.routes";
 import crisisRoutes from "./routes/crisis.routes";
+import { errorHandler } from "./middleware/error.middleware";
+
 
 dotenv.config();
 
@@ -49,6 +51,9 @@ app.get("/", (_req, res) => {
 
 // 🔹 Servidor
 const PORT = process.env.PORT || 4000;
+
+// MIDDLEWARE DE ERRORES (SIEMPRE AL FINAL)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   logger.info(`Servidor corriendo en http://localhost:${PORT}`);
