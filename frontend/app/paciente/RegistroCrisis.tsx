@@ -7,18 +7,12 @@ export default function EditarPaciente() {
 
   const labels = ['Nombre', 'Primer Apellido', 'Segundo Apellido', 'Altura', 'Peso'];
 
-  // 5 inputs normales
-  const [inputs, setInputs] = useState(Array(5).fill(''));
 
-  // 2 fechas
   const [fecha1, setFecha1] = useState(new Date());
-  const [fecha2, setFecha2] = useState(new Date());
   const [showFecha1, setShowFecha1] = useState(false);
-  const [showFecha2, setShowFecha2] = useState(false);
 
-  // 2 selectores
+  //Selector
   const [opcion1, setOpcion1] = useState('A');
-  const [opcion2, setOpcion2] = useState('X');
 
   // 7 checkboxes (Switch)
   const [checks, setChecks] = useState(Array(7).fill(false));
@@ -27,9 +21,7 @@ export default function EditarPaciente() {
     const datos = {
       inputs,
       fecha1,
-      fecha2,
       opcion1,
-      opcion2,
       checks,
     };
     console.log('Datos guardados:', datos);
@@ -41,37 +33,6 @@ export default function EditarPaciente() {
             resizeMode="cover"
           >
       <ScrollView contentContainerStyle={styles.contenedor}>
-      <Text style={styles.titulo}>Editar Usuario</Text>
-
-       <View style={styles.contenedor}>
-      {labels.map((label, index) => (
-        <View key={index} style={styles.item}>
-          {/* Texto como label */}
-          <Text style={styles.label}>{label}</Text>
-
-          {/* Input asociado */}
-          <TextInput
-            value={inputs[index]}
-            onChangeText={(text) => {
-              const nuevos = [...inputs];
-              nuevos[index] = text;
-              setInputs(nuevos);
-            }}
-            placeholder={`Escribe ${label}`}
-            placeholderTextColor="#888"
-            style={styles.input}
-          />
-        </View>
-      ))}
-    </View>
-
-      {/* Selector Genero */}
-      <Text>Genero:</Text>
-      <Picker selectedValue={opcion1} onValueChange={setOpcion1}>
-        <Picker.Item label="Masculino" value="Masculino" />
-        <Picker.Item label="Femenino" value="Femenino" />
-        <Picker.Item label="Otro" value="Otro" />
-      </Picker>
 
       {/* Fecha 1 */}
       <Text>Fecha 1: {fecha1.toLocaleDateString()}</Text>
@@ -85,26 +46,6 @@ export default function EditarPaciente() {
         }}
         onCancel={() => setShowFecha1(false)}
       />
-
-      {/* Fecha 2 */}
-      <Text>Fecha 2: {fecha2.toLocaleDateString()}</Text>
-      <Button title="Seleccionar Fecha 2" onPress={() => setShowFecha2(true)} />
-      <DateTimePickerModal
-        isVisible={showFecha2}
-        mode="date"
-        onConfirm={(date) => {
-          setFecha2(date);
-          setShowFecha2(false);
-        }}
-        onCancel={() => setShowFecha2(false)}
-      />
-      {/* Selector 1 */}
-      <Text>Opción 2:</Text>
-      <Picker selectedValue={opcion2} onValueChange={setOpcion2}>
-        <Picker.Item label="Valor X" value="X" />
-        <Picker.Item label="Valor Y" value="Y" />
-        <Picker.Item label="Valor Z" value="Z" />
-      </Picker>
 
       {/* 7 checkboxes con Switch */}
       <Text style={styles.subtitulo}>Selecciona opciones:</Text>

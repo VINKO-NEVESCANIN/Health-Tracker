@@ -1,49 +1,18 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import { parseQueryParams } from 'expo-router/build/fork/getStateFromPath-forks';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function EditarPaciente() {
 
-  const params = useLocalSearchParams();
-  const condition = params.condition;
-  const [texto, setTexto] = useState('');
-
-  // Fecha y Hora
-  const [fecha, setFecha] = useState(new Date());
-  const [hora, setHora] = useState(new Date());
-  const [showFecha, setShowFecha] = useState(false);
-  const [showHora, setShowHora] = useState(false);
+   const items = [
+  { id: 1, name: 'Paciente 1', Tepilepsy: 'Tipo de Epilepsia 1', Edad: 25, Image: require('../Icon/JuanPaciente.jpg'), Tel: '6612345678' },
+  { id: 2, name: 'Paciente 2', Tepilepsy: 'Tipo de Epilepsia 2', Edad: 30, Image: require('../Icon/Paciente2.jpg'), Tel: '6612344378'  },
+  { id: 3, name: 'Paciente 3', Tepilepsy: 'Tipo de Epilepsia 3', Edad: 28, Image: require('../Icon/Paciente3.jpeg'), Tel: '6612321238'  },
+  { id: 4, name: 'Paciente 4', Tepilepsy: 'Tipo de Epilepsia 4', Edad: 35, Image: require('../Icon/PacienteP.jpeg'), Tel: '6632324123'  },
+  ]
   
-  const guardarGestion = () => {
-    const datos = {fecha,hora,texto};
-
-    if(condition === '2'){
-        router.push({
-        pathname: '../../doctor/GestionarCitas'
-        })
-      }else{
-        router.push({
-        pathname: '../../paciente/Pacientes'
-        });
-      }
-     };
-      
-
-  const guardarPacientes = () => {
-    const datos = {
-      fecha,
-      hora,
-      texto,
-    };
-
-        router.push({
-        pathname: '../../paciente/Pacientes'
-        });
-
-    console.log('Datos guardados:', datos);
-  }
     return (
       <ImageBackground
          source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
@@ -51,71 +20,41 @@ export default function EditarPaciente() {
             resizeMode="cover"
           >
       <ScrollView contentContainerStyle={styles.contenedor}>
-      <View style>
+        
+      <FlatList
+       data={items}
+      keyExtractor={(item) => item.id.toString()}
+      contentContainerStyle={styles.contenedor}
+      renderItem={({ item }) => (
         <Pressable 
         style={styles.card}
         onPress={() => router.push({
-        pathname: '../../paciente/Pacientes',
-        params: { condition: '1' }
+        pathname: '../../paciente/EditarCita',
+        params: { condition: '2',
+          id: item.id
+         }
         })}>
         <Image 
-          source={require('../Icon/JuanPaciente.jpg')} // Ruta de la imagen de perfil
+          source={item.Image} // Ruta de la imagen de perfil
           style={styles.foto}
         /> 
-        <Text>Juan Carlos Albañez Gastelum</Text>
-        <Text>Tipo de Epilepsia</Text>
-        <Text>25 años</Text>
-        <Text>6621234567</Text>
+        <Text>{item.name}</Text>
+        <Text>{item.Tepilepsy}</Text>
+        <Text>{item.Edad}</Text>
+        <Text>{item.Tel}</Text>
         </Pressable>
-      </View>
+  )}
+      />
 
        <View style={styles.contenedor}>
       
     </View>
 
-      {/* Fecha */}
-      <Text>Fecha:</Text>
-      <Button color='#6631D7' title={fecha.toLocaleDateString()} onPress={() => setShowFecha(true)} />
-      <DateTimePickerModal
-        isVisible={showFecha}
-        mode="date"
-        onConfirm={(date) => {
-          setFecha(date);
-          setShowFecha(false);
-        }}
-        onCancel={() => setShowFecha(false)}
-      />
-
-      {/* Hora */}
-      <Text>Hora:</Text>
-      <Button color='#6631D7' title={hora.toLocaleTimeString()} onPress={() => setShowHora(true)} />
-      <DateTimePickerModal
-        isVisible={showHora}
-        mode="time"
-        onConfirm={(date) => {
-          setHora(date);
-          setShowHora(false);
-        }}
-        onCancel={() => setShowHora(false)}
-      />
-      {/* Resumen de la cita */}
-      <Text>Resumen de la cita:</Text>
-      <TextInput
-     style={styles.textarea}
-      multiline={true}
-      numberOfLines={4}
-      placeholder="Escribe aquí tu comentario"
-      value={texto}
-     onChangeText={setTexto}
-      />  
-
-      <Button color='#6631D7' title="Editar Cita" onPress={guardarGestion} />
     </ScrollView>
       </ImageBackground>
     );
+  
   }
-
-
 
    const styles = StyleSheet.create({
 
@@ -208,5 +147,6 @@ textarea: {
     height: 60,
     borderRadius: 60, // círculo
     marginBottom: 12,
-  }
+  },
+
 });

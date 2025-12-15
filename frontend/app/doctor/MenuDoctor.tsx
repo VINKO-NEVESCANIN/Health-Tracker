@@ -12,7 +12,7 @@ export default function MenuDoctor() {
 };
 
   const Botones: Boton[] = [
-    { id: 1, title: 'Gestionar Cita', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/GestionarCita' },
+    { id: 1, title: 'Gestionar Cita', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/GestionarCitas' },
     { id: 2, title: 'Pacientes', image: require("../Icon/LoginIcon.png"), ruta: '../paciente/Pacientes' },
     { id: 3, title: 'Crisis Recientes', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/CrisisRecientes' },
     { id: 4, title: 'EpileptoGrama', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/EpileptoGrama' },
