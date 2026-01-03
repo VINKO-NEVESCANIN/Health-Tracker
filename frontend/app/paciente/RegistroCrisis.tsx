@@ -1,147 +1,98 @@
-import { useState } from 'react';
-import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { useState } from "react";
+import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-export default function EditarPaciente() {
-
-  const labels = ['Nombre', 'Primer Apellido', 'Segundo Apellido', 'Altura', 'Peso'];
-
-
+export default function RegistroCrisis() {
+  const [duracion, setDuracion] = useState("1 Minutos");
+  const [recuperacion, setRecuperacion] = useState("1 Minutos");
   const [fecha1, setFecha1] = useState(new Date());
   const [showFecha1, setShowFecha1] = useState(false);
+  const [check, setCheck] = useState(false);
 
-  //Selector
-  const [opcion1, setOpcion1] = useState('A');
+  const items = Array.from({ length: 60 }, (_, i) => ({
+    label: `${i + 1} Minutos`,
+    value: `${i + 1} Minutos`,
+  }));
 
-  // 7 checkboxes (Switch)
-  const [checks, setChecks] = useState(Array(7).fill(false));
+  const items2 = Array.from({ length: 8 }, (_, i) => ({
+    label: `${i + 1} Minutos`,
+    value: `${i + 1} Minutos`,
+  }));
 
   const guardar = () => {
     const datos = {
-      inputs,
       fecha1,
-      opcion1,
-      checks,
+      duracion,
+      recuperacion,
+      check,
     };
-    console.log('Datos guardados:', datos);
-  }
-    return (
-      <ImageBackground
-         source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
-            style={styles.fondo}
-            resizeMode="cover"
-          >
+    console.log("Datos guardados:", datos);
+  };
+
+  return (
+    <ImageBackground source={require("../../assets/FondoApp.png")} style={styles.fondo} resizeMode="cover">
       <ScrollView contentContainerStyle={styles.contenedor}>
+        <Text style={styles.title}>Fecha de la crisis:</Text>
+        <Button color='#6631D7' title={fecha1.toLocaleDateString()} onPress={() => setShowFecha1(true)} />
+        <DateTimePickerModal
+          isVisible={showFecha1}
+          mode="date"
+          onConfirm={(date) => {
+            setFecha1(date);
+            setShowFecha1(false);
+          }}
+          onCancel={() => setShowFecha1(false)}
+        />
 
-      {/* Fecha 1 */}
-      <Text>Fecha 1: {fecha1.toLocaleDateString()}</Text>
-      <Button title="Seleccionar Fecha 1" onPress={() => setShowFecha1(true)} />
-      <DateTimePickerModal
-        isVisible={showFecha1}
-        mode="date"
-        onConfirm={(date) => {
-          setFecha1(date);
-          setShowFecha1(false);
-        }}
-        onCancel={() => setShowFecha1(false)}
-      />
+        <Text style={styles.title}>Duración de la crisis:</Text>
+        <Picker style={styles.pickers} selectedValue={duracion} onValueChange={(val) => setDuracion(val)}>
+          {items.map((item) => (
+            <Picker.Item key={item.value} label={item.label} value={item.value} />
+          ))}
+        </Picker>
 
-      {/* 7 checkboxes con Switch */}
-      <Text style={styles.subtitulo}>Selecciona opciones:</Text>
-      {checks.map((valor, index) => (
-        <View key={index} style={styles.checkboxContainer}>
-          <Switch
-            value={valor}
-            onValueChange={(nuevo) => {
-              const nuevos = [...checks];
-              nuevos[index] = nuevo;
-              setChecks(nuevos);
-            }}
-          />
-          <Text>Opción {index + 1}</Text>
+        <Text style={styles.title}>Tiempo de recuperación:</Text>
+        <Picker style={[styles.pickers, { marginBottom: 12 }]} selectedValue={recuperacion} onValueChange={(val) => setRecuperacion(val)}>
+          {items2.map((item) => (
+            <Picker.Item key={item.value} label={item.label} value={item.value} />
+          ))}
+        </Picker>
+        <View style={styles.checkboxContainer}>
+          <Switch value={check} onValueChange={(newValue) => setCheck(newValue)} />
+          <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
         </View>
-      ))}
 
-      <Button title="Guardar" onPress={guardar} />
-    </ScrollView>
-      </ImageBackground>
-    );
-  }
+        <Button color='#6631D7' title="Guardar" onPress={guardar} />
+      </ScrollView>
+    </ImageBackground>
+  );
+}
 
-
-   const styles = StyleSheet.create({
-
-  fondo:{
-    flex: 1,
-  },
-
-  ListaPacientes:{
+const styles = StyleSheet.create({
+  fondo: { flex: 1 },
+  contenedor: { paddingHorizontal: 16, paddingBottom: 20 },
+  title: { fontSize: 18, marginVertical: 10 },
+  checkboxContainer: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
+  
+  botones:{
     backgroundColor: "#C9B1FF",
-    width: 120,
-    height: 120,
-    boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
-    borderRadius: 20,
+    width: "100%",
+    height: "15%",
+    borderRadius: 10,
     borderWidth: 2,
+  },
 
-  },
-   pantalla: {
-    flex: 1,
-    paddingTop: 40,
-  },
-  contenedor: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-  },
-  fila: {
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  input: {
-    justifyContent: 'center',
+  pickers:{
+    backgroundColor: "white",
+    width: "100%",
+    height: "15%",
+    borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#000000ff",
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: '#ffffff',
-    alignSelf: 'center',
-    width: '95%',
-  },
-  contenedor2: {
-    padding: 20,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  subtitulo: {
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  input2: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
-    color: '#000',
-    marginBottom: 12,
-    elevation: 2,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 8
   },
-  label: {
-    fontSize: 16,
-    paddingLeft: 10,
-    marginBottom: 4,
-  },
-  item: {
-
-  },
-
 });

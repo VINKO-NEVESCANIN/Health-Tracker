@@ -4,7 +4,7 @@ import {TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View, I
 import { FlatList } from 'react-native-gesture-handler';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-export default function EditarPaciente() {
+export default function GestionarCitas() {
 
    const items = [
   { id: 1, name: 'Paciente 1', Tepilepsy: 'Tipo de Epilepsia 1', Edad: 25, Image: require('../Icon/JuanPaciente.jpg'), Tel: '6612345678' },

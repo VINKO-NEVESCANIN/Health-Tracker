@@ -139,7 +139,6 @@ export default function EditarPaciente() {
     backgroundColor: "#C9B1FF",
     width: 120,
     height: 120,
-    boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
     borderRadius: 20,
     borderWidth: 2,
 

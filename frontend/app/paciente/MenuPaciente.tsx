@@ -15,7 +15,7 @@ export default function MenuPaciente() {
   //ARRAY DE BOTONES DE MENU
     const Botones: Boton[] = [
       { id: 1, title: 'Mis Citas', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCitas' },
-      { id: 2, title: 'Registrar Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/RegistrarCrisis' },
+      { id: 2, title: 'Registrar Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../paciente/RegistroCrisis' },
       { id: 3, title: 'EpileptoGrama', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/EpileptoGrama' },
       { id: 4, title: 'Mis Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCrisis' },
       { id: 5, title: 'Medicamentos', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/Medicamentos' },
