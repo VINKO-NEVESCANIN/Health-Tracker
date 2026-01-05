@@ -2,13 +2,13 @@ import { router } from 'expo-router';
 import {ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
-export default function GestionarCitas() {
+export default function MisCitas() {
 
    const items = [
-  { id: 1, name: 'Paciente 1', Tepilepsy: 'Tipo de Epilepsia 1', Edad: 25, Image: require('../Icon/JuanPaciente.jpg'), Tel: '6612345678' },
-  { id: 2, name: 'Paciente 2', Tepilepsy: 'Tipo de Epilepsia 2', Edad: 30, Image: require('../Icon/Paciente2.jpg'), Tel: '6612344378'  },
-  { id: 3, name: 'Paciente 3', Tepilepsy: 'Tipo de Epilepsia 3', Edad: 28, Image: require('../Icon/Paciente3.jpeg'), Tel: '6612321238'  },
-  { id: 4, name: 'Paciente 4', Tepilepsy: 'Tipo de Epilepsia 4', Edad: 35, Image: require('../Icon/PacienteP.jpeg'), Tel: '6632324123'  },
+  { id: 1, name: 'Doctor 1', Fecha: '04-01-2026', Hora: '12:30 PM', Image: require('../Icon/JuanPaciente.jpg'), Resumen: 'Resumen de la Cita' },
+  { id: 2, name: 'Doctor 2', Fecha: '12-01-2026', Hora: '02:00 PM', Image: require('../Icon/Paciente2.jpg'), Resumen: 'Resumen de la Cita' },
+  { id: 3, name: 'Doctor 3', Fecha: '26-01-2026', Hora: '04:30 PM', Image: require('../Icon/Paciente3.jpeg'), Resumen: 'Resumen de la Cita' },
+  { id: 4, name: 'Doctor 4', Fecha: '02-02-2026', Hora: '07:00 PM', Image: require('../Icon/PacienteP.jpeg'), Resumen: 'Resumen de la Cita' },
   ]
   
     return (
@@ -37,9 +37,9 @@ export default function GestionarCitas() {
           style={styles.foto}
         /> 
         <Text>{item.name}</Text>
-        <Text>{item.Tepilepsy}</Text>
-        <Text>{item.Edad}</Text>
-        <Text>{item.Tel}</Text>
+        <Text>{item.Fecha}</Text>
+        <Text>{item.Hora}</Text>
+        <Text>{item.Resumen}</Text>
         </Pressable>
   )}
       />
