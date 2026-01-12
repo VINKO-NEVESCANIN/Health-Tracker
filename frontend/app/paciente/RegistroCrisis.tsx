@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
   fondo: { flex: 1 },
   contenedor: { paddingHorizontal: 16, paddingBottom: 20 },
   title: { fontSize: 18, marginVertical: 10 },
-  checkboxContainer: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
   
   botones:{
     backgroundColor: "#C9B1FF",

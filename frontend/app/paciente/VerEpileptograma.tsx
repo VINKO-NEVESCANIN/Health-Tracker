@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
   },
-  checkboxContainer: {
+  checkboxContainers: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8
