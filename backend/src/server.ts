@@ -1,46 +1,60 @@
+// src/server.ts
 import express from "express";
 import cors from "cors";
-import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+import morgan from "morgan";
+
+import logger from "./config/logger";
+
+import authRoutes from "./routes/auth.routes";
+import patientRoutes from "./routes/patient.routes";
+import appointmentRoutes from "./routes/appointment.routes";
+import medicationRoutes from "./routes/medication.routes";
+import patientMedicationRoutes from "./routes/patientMedication.routes";
+import studyRoutes from "./routes/study.routes";
+import vitalRoutes from "./routes/vital.routes";
+import crisisRoutes from "./routes/crisis.routes";
+import { errorHandler } from "./middleware/error.middleware";
+
+
+dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
 
+// 🔹 Middlewares base
 app.use(cors());
 app.use(express.json());
 
-// --- TEST ENDPOINT ---
-app.get("/", (req, res) => {
-  res.json({ message: "Backend funcionando correctamente" });
+// 🔥 Morgan → Winston
+app.use(
+  morgan("dev", {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+);
+
+// 🔹 Rutas principales
+app.use("/auth", authRoutes);
+app.use("/patients", patientRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use("/medications", medicationRoutes);
+app.use("/patient-medications", patientMedicationRoutes);
+app.use("/studies", studyRoutes);
+app.use("/vitals", vitalRoutes);
+app.use("/crisis", crisisRoutes);
+
+// 🔹 Ruta raíz
+app.get("/", (_req, res) => {
+  res.send("API Health Tracker funcionando 🚀");
 });
 
-// --- Crear usuario (temporal para pruebas) ---
-app.post("/api/users", async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
+// 🔹 Servidor
+const PORT = process.env.PORT || 4000;
 
-    const user = await prisma.user.create({
-      data: { name, email, password, role },
-    });
+// MIDDLEWARE DE ERRORES (SIEMPRE AL FINAL)
+app.use(errorHandler);
 
-    res.json(user);
-  } catch (error: any) {
-    console.error("Error creando usuario:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// --- Obtener todos los usuarios ---
-app.get("/api/users", async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (error: any) {
-    console.error("Error obteniendo usuarios:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+  logger.info(`Servidor corriendo en http://localhost:${PORT}`);
 });

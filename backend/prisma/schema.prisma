@@ -1,10 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,106 +8,96 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  name        String
-  email       String        @unique
-  password    String
-  role        String        // "doctor" | "patient" | "admin"
-  createdAt   DateTime      @default(now())
-
-  patients    Patient[]     @relation("DoctorPatients")
-  appointments Appointment[] // citas como doctor
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  role         String
+  appointments Appointment[]
+  patients     Patient[]     @relation("DoctorPatients")
 }
 
 model Patient {
-  id          Int       @id @default(autoincrement())
-  nombre      String
-  apellido    String?
-  tipoEpilepsia String?
-  primeraCrisis DateTime?
-  totalCrisis  Int       @default(0)
-  enfermedades String?
-  edad        Int?
-  telefono    String?
-  direccion   String?
-  email       String?   @unique
-  createdAt   DateTime  @default(now())
-
-  doctorId    Int
-  doctor      User      @relation("DoctorPatients", fields: [doctorId], references: [id])
-
-  appointments Appointment[]
-  medications  PatientMedication[]
-  studies      Study[]
-  vitals       Vital[]
-  crisis       Crisis[]
+  id              Int                 @id @default(autoincrement())
+  email           String?             @unique
+  createdAt       DateTime            @default(now())
+  doctorId        Int
+  address         String?
+  age             Int?
+  diseases        String?
+  epilepsyType    String?
+  firstCrisisDate DateTime?
+  firstName       String
+  lastName        String?
+  phone           String?
+  totalCrisis     Int                 @default(0)
+  appointments    Appointment[]
+  crisis          Crisis[]
+  doctor          User                @relation("DoctorPatients", fields: [doctorId], references: [id])
+  medications     PatientMedication[]
+  studies         Study[]
+  vitals          Vital[]
 }
 
 model Appointment {
   id        Int      @id @default(autoincrement())
   patientId Int
   doctorId  Int
-  fecha     DateTime
-  notas     String?
-  status    String   @default("scheduled") // scheduled|cancelled|done
-
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  date      DateTime
+  notes     String?
+  status    String   @default("scheduled")
   doctor    User     @relation(fields: [doctorId], references: [id])
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
 model Medication {
-  id          Int      @id @default(autoincrement())
-  nombre      String
-  descripcion String?
-  createdAt   DateTime @default(now())
-
+  id          Int                 @id @default(autoincrement())
+  createdAt   DateTime            @default(now())
+  description String?
+  name        String
   patients    PatientMedication[]
 }
 
 model PatientMedication {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   patientId    Int
   medicationId Int
-  dosis        String?
-  intervalo    String?
-  startDate    DateTime?
+  dose         String?
   endDate      DateTime?
-
-  patient      Patient    @relation(fields: [patientId], references: [id])
+  interval     String?
+  startDate    DateTime?
   medication   Medication @relation(fields: [medicationId], references: [id])
+  patient      Patient    @relation(fields: [patientId], references: [id])
 }
 
 model Study {
   id        Int      @id @default(autoincrement())
   patientId Int
-  tipo      String
-  fecha     DateTime @default(now())
-  notas     String?
-  fileUrl   String?  // si subes pdf / imagen
-
-  patient   Patient @relation(fields: [patientId], references: [id])
+  date      DateTime @default(now())
+  fileUrl   String?
+  notes     String?
+  type      String
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
 model Vital {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  fecha     DateTime @default(now())
-  heartRate Int?
-  oxygen    Int?
-  temp      Float?
-  notes     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  heartRate   Int?
+  oxygen      Int?
+  date        DateTime @default(now())
+  notes       String?
+  temperature Float?
+  patient     Patient  @relation(fields: [patientId], references: [id])
 }
 
 model Crisis {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  fecha     DateTime @default(now())
-  intensidad Int?
-  duracionMin Int?
-  notas     String?
-
-  patient   Patient @relation(fields: [patientId], references: [id])
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  date        DateTime @default(now())
+  durationMin Int?
+  intensity   Int?
+  notes       String?
+  patient     Patient  @relation(fields: [patientId], references: [id])
 }
-
