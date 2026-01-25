@@ -1,58 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TextInput } from "react-native";
+import { View, Text, Button, FlatList, StyleSheet, TextInput, Image, ImageBackground} from "react-native";
+import { router, useRouter } from 'expo-router';
 
 export default function IndexScreen() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [newEvent, setNewEvent] = useState("");
+  const [User, setUser] = useState("");
+  const [Pass, setPass] = useState("");
+  const Router = useRouter();
+  
+  function lala() {
+    console.log("Bienvenido:", User)
+    Router.push({
+      pathname:'../doctor/MenuDoctor',
+      params: { 
+        user: User,
+        pass: Pass
+       }
+    });
+   }
 
-  // Cargar eventos desde backend
-  useEffect(() => {
-    fetch("http://localhost:4000/api/events")
-      .then((res) => res.json())
-      .then((data) => setEvents(data))
-      .catch((err) => console.error("Error cargando eventos:", err));
-  }, []);
-
-  // Crear un evento nuevo
-  const addEvent = () => {
-    if (!newEvent.trim()) return;
-    fetch("http://localhost:4000/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: newEvent }),
-    })
-      .then((res) => res.json())
-      .then((event) => {
-        setEvents([...events, event]);
-        setNewEvent("");
-      })
-      .catch((err) => console.error("Error agregando evento:", err));
-  };
 
   return (
+      <ImageBackground
+           source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+            style={styles.fondo}
+            resizeMode="cover"
+          >
     <View style={styles.container}>
-      <Text style={styles.title}>📌 Línea de tiempo - Ataques de Ansiedad</Text>
+
+      <Image
+        source={require('../Icon/LoginIcon.png')}
+        style={{ width: 100, height: 100, alignSelf: 'center', marginBottom: 20 }}
+      />
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Usuario"
+        value={User}
+        onChangeText={setUser}
+      />
 
       <TextInput
         style={styles.input}
-        placeholder="Describe el evento..."
-        value={newEvent}
-        onChangeText={setNewEvent}
+        placeholder="Contraseña"
+        value={Pass}
+        onChangeText={setPass}
       />
 
-      <Button title="Registrar Evento" onPress={addEvent} />
-
-      <FlatList
-        data={events}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemText}>🕒 {new Date(item.date).toLocaleString()}</Text>
-            <Text>{item.description}</Text>
-          </View>
-        )}
-      />
+      <Button title="Iniciar Sesion" onPress={lala} />
+      <Text onPress={lala} style={{alignSelf:"center", textDecorationLine:"underline"}}>
+        Olvide Mi Contraseña...</Text>
     </View>
+    </ImageBackground>
   );
 }
 
@@ -70,6 +68,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "#ddd",
+  },
+   fondo:{
+    flex: 1,
   },
   itemText: { fontWeight: "bold" },
 });

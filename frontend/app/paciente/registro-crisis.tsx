@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 
-export default function RegistroCrisis() {
+export default function RegistroCrisis2() {
   const [evento, setEvento] = useState({
     descripcion: "",
     fecha: "",
