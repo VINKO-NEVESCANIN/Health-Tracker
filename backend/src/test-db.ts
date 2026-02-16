@@ -1,41 +1,55 @@
-import { PrismaClient } from "./generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Crear un usuario (paciente)
-  const user = await prisma.user.create({
+  // 1️⃣ Crear doctor (User)
+  const doctor = await prisma.user.create({
     data: {
-      name: "Paciente de Prueba",
-      email: "paciente@example.com",
-      password: "123456", // ⚠️ en producción se cifra con bcrypt
+      name: "Doctor Prueba",
+      email: "doctor@example.com",
+      password: "123456",
+      role: "doctor",
     },
   });
 
-  console.log("✅ Usuario creado:", user);
+  console.log("✅ Doctor creado:", doctor);
 
-  // Crear un evento ligado al usuario
-  const event = await prisma.event.create({
+  // 2️⃣ Crear paciente
+  const patient = await prisma.patient.create({
     data: {
-      description: "Ataque de ansiedad leve",
+      firstName: "Paciente",
+      lastName: "Test",
+      doctorId: doctor.id,
+      age: 30,
+    },
+  });
+
+  console.log("✅ Paciente creado:", patient);
+
+  // 3️⃣ Crear crisis (EVENTO REAL)
+  const crisis = await prisma.crisis.create({
+    data: {
+      patientId: patient.id,
       intensity: 5,
-      userId: user.id, // 🔑 relación con User
+      durationMin: 10,
+      notes: "Ataque de ansiedad leve",
     },
   });
 
-  console.log("✅ Evento creado:", event);
+  console.log("✅ Crisis creada:", crisis);
 
-  // Traer usuario con sus eventos
-  const userWithEvents = await prisma.user.findUnique({
-    where: { id: user.id },
-    include: { events: true },
+  // 4️⃣ Traer paciente con crisis
+  const patientWithCrisis = await prisma.patient.findUnique({
+    where: { id: patient.id },
+    include: { crisis: true },
   });
 
-  console.log("📌 Usuario con eventos:", userWithEvents);
+  console.log("📌 Paciente con crisis:", patientWithCrisis);
 }
 
 main()
-  .catch((e) => console.error(e))
+  .catch(console.error)
   .finally(async () => {
     await prisma.$disconnect();
   });
