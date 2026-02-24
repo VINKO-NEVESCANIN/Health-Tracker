@@ -21,24 +21,27 @@ model User {
 
 model Patient {
   id              Int                 @id @default(autoincrement())
-  email           String?             @unique
-  createdAt       DateTime            @default(now())
   doctorId        Int
-  address         String?
+  gender          String?
   age             Int?
-  diseases        String?
+  height          String?
+  weight          String?
+  birthdate      DateTime?
   epilepsyType    String?
   firstCrisisDate DateTime?
   firstName       String
   lastName        String?
-  phone           String?
-  totalCrisis     Int                 @default(0)
+  anxiety          Boolean?
+  migraine         Boolean?
+  addictions       Boolean?
+  hypertension     Boolean?
+  cogniDisorder    Boolean?
+  respiDisorder    Boolean?
   appointments    Appointment[]
   crisis          Crisis[]
   doctor          User                @relation("DoctorPatients", fields: [doctorId], references: [id])
   medications     PatientMedication[]
   studies         Study[]
-  vitals          Vital[]
 }
 
 model Appointment {
@@ -46,6 +49,7 @@ model Appointment {
   patientId Int
   doctorId  Int
   date      DateTime
+  time      String
   notes     String?
   status    String   @default("scheduled")
   doctor    User     @relation(fields: [doctorId], references: [id])
@@ -54,10 +58,8 @@ model Appointment {
 
 model Medication {
   id          Int                 @id @default(autoincrement())
-  createdAt   DateTime            @default(now())
-  description String?
+  type        String
   name        String
-  patients    PatientMedication[]
 }
 
 model PatientMedication {
@@ -65,40 +67,30 @@ model PatientMedication {
   patientId    Int
   medicationId Int
   dose         String?
-  endDate      DateTime?
   interval     String?
   startDate    DateTime?
-  medication   Medication @relation(fields: [medicationId], references: [id])
   patient      Patient    @relation(fields: [patientId], references: [id])
 }
 
 model Study {
   id        Int      @id @default(autoincrement())
   patientId Int
-  date      DateTime @default(now())
-  fileUrl   String?
-  notes     String?
-  type      String
+  dateEEG   DateTime?
+  dateRMNC  DateTime?
+  dateNSMAP DateTime?	
+  resEEG    String?
+  resRMNC   String?
+  resNSMAP  String?
   patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
-model Vital {
-  id          Int      @id @default(autoincrement())
-  patientId   Int
-  heartRate   Int?
-  oxygen      Int?
-  date        DateTime @default(now())
-  notes       String?
-  temperature Float?
-  patient     Patient  @relation(fields: [patientId], references: [id])
-}
 
 model Crisis {
   id          Int      @id @default(autoincrement())
   patientId   Int
-  date        DateTime @default(now())
-  durationMin Int?
-  intensity   Int?
-  notes       String?
+  crisisDate  DateTime
+  duration    Int?
+  recuperation   Int?
+  unconscius  Boolean?
   patient     Patient  @relation(fields: [patientId], references: [id])
 }
