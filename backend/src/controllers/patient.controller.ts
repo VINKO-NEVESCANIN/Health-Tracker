@@ -73,7 +73,6 @@ export const getPatient = async (req: any, res: Response) => {
         appointments: true,
         medications: { include: { medication: true } },
         studies: true,
-        vitals: true,
         crisis: true,
       },
     });
