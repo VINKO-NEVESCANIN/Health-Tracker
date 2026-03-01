@@ -4,7 +4,7 @@ import prisma from "../config/db";
 
 export const createAppointment = async (req: any, res: Response) => {
   try {
-    const { patientId, date, notes } = req.body;
+    const { patientId, date, notes, time } = req.body;
     if (!patientId || !date) return res.status(400).json({ error: "patientId y date requeridos" });
 
     const appointment = await prisma.appointment.create({
@@ -12,6 +12,7 @@ export const createAppointment = async (req: any, res: Response) => {
         patientId: Number(patientId),
         date: new Date(date),
         notes,
+        time,
         doctorId: req.userId,
       },
     });
