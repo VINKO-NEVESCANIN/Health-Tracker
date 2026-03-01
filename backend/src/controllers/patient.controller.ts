@@ -7,13 +7,18 @@ export const createPatient = async (req: any, res: Response) => {
     const {
       firstName,
       lastName,
-      epilepsyType,
+      gender,
+      height,
+      weight,
+      birthdate,
       firstCrisisDate,
-      age,
-      phone,
-      address,
-      diseases,
-      email
+      epilepsyType,
+      anxiety,
+      migraine,
+      addictions,
+      hypertension,
+      cogniDisorder,
+      respiDisorder
     } = req.body;
 
     const doctorId = req.userId;
@@ -21,16 +26,20 @@ export const createPatient = async (req: any, res: Response) => {
 
     const patient = await prisma.patient.create({
       data: {
-        firstName,
-        lastName,
-        epilepsyType,
-        firstCrisisDate: firstCrisisDate ? new Date(firstCrisisDate) : undefined,
-        age,
-        phone,
-        address,
-        diseases,
-        email,
-        doctorId,
+     firstName,
+      lastName,
+      gender,
+      height,
+      weight,
+      birthdate,
+      firstCrisisDate: firstCrisisDate ? new Date(firstCrisisDate) : undefined,
+      epilepsyType,
+      anxiety,
+      migraine,
+      addictions,
+      hypertension,
+      cogniDisorder,
+      respiDisorder
       },
     });
 
@@ -54,7 +63,6 @@ export const getPatients = async (req: any, res: Response) => {
           { lastName: { contains: search, mode: "insensitive" } },
         ],
       },
-      orderBy: { createdAt: "desc" },
     });
 
     res.json(patients);
@@ -74,6 +82,7 @@ export const getPatient = async (req: any, res: Response) => {
         medications: { include: { medication: true } },
         studies: true,
         crisis: true,
+        doctor: true
       },
     });
 

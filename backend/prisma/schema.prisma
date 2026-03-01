@@ -17,29 +17,32 @@ model User {
   role         String
   appointments Appointment[]
   patients     Patient[]     @relation("DoctorPatients")
+  patientId    Patient?      @relation("PatientUser")
 }
 
 model Patient {
   id              Int                 @id @default(autoincrement())
-  doctorId        Int
+  userId          Int?                 
+  doctorId        Int?
   gender          String?
   age             Int?
   height          String?
   weight          String?
-  birthdate      DateTime?
+  birthdate       DateTime?
   epilepsyType    String?
   firstCrisisDate DateTime?
-  firstName       String
+  firstName       String?
   lastName        String?
   anxiety          Boolean?
   migraine         Boolean?
   addictions       Boolean?
   hypertension     Boolean?
   cogniDisorder    Boolean?
-  respiDisorder    Boolean?
+  respiDisorder    Boolean?	  
   appointments    Appointment[]
   crisis          Crisis[]
-  doctor          User                @relation("DoctorPatients", fields: [doctorId], references: [id])
+  doctor          User?                @relation("DoctorPatients", fields: [doctorId], references: [id])
+  patient         User?                @relation("PatientUser", fields: [userId], references: [id])
   medications     PatientMedication[]
   studies         Study[]
 }
@@ -60,16 +63,20 @@ model Medication {
   id          Int                 @id @default(autoincrement())
   type        String
   name        String
+  abbreviation String?
+  patients    PatientMedication[]
 }
 
 model PatientMedication {
   id           Int        @id @default(autoincrement())
   patientId    Int
   medicationId Int
+  name         String?
   dose         String?
   interval     String?
   startDate    DateTime?
   patient      Patient    @relation(fields: [patientId], references: [id])
+  medication   Medication @relation(fields: [medicationId], references: [id])
 }
 
 model Study {
