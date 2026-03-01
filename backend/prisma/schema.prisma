@@ -17,12 +17,10 @@ model User {
   role         String
   appointments Appointment[]
   patients     Patient[]     @relation("DoctorPatients")
-  patientId    Patient?      @relation("PatientUser")
 }
 
 model Patient {
   id              Int                 @id @default(autoincrement())
-  userId          Int?                 
   doctorId        Int?
   gender          String?
   age             Int?
@@ -42,7 +40,6 @@ model Patient {
   appointments    Appointment[]
   crisis          Crisis[]
   doctor          User?                @relation("DoctorPatients", fields: [doctorId], references: [id])
-  patient         User?                @relation("PatientUser", fields: [userId], references: [id])
   medications     PatientMedication[]
   studies         Study[]
 }
@@ -63,7 +60,7 @@ model Medication {
   id          Int                 @id @default(autoincrement())
   type        String
   name        String
-  abbreviation String?
+  abbreviation String
   patients    PatientMedication[]
 }
 
