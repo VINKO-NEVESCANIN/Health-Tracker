@@ -4,11 +4,19 @@ import prisma from "../config/db";
 
 export const createStudy = async (req: Request, res: Response) => {
   try {
-    const { patientId, type, notes, fileUrl } = req.body;
-    if (!patientId || !type) return res.status(400).json({ error: "patientId y type requeridos" });
+    const { patientId, dateEEG, dateRMNC, dateNSMAP, resEEG, resRMNC, resNSMAP} = req.body;
+    if (!patientId) return res.status(400).json({ error: "patientId requeridos" });
 
     const study = await prisma.study.create({
-      data: { patientId: Number(patientId), type, notes: notes ?? null, fileUrl: fileUrl ?? null },
+      data: { 
+        patientId: Number(patientId), 
+        dateEEG: dateEEG ? new Date(dateEEG) : undefined, 
+        dateRMNC: dateRMNC ? new Date(dateRMNC) : undefined, 
+        dateNSMAP: dateNSMAP ? new Date(dateNSMAP) : undefined, 
+        resEEG: resEEG ?? null, 
+        resRMNC: resRMNC ?? null, 
+        resNSMAP: resNSMAP ?? null 
+      },
     });
     res.status(201).json(study);
   } catch (err) {
@@ -25,6 +33,29 @@ export const getPatientStudies = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error obteniendo estudios" });
+  }
+};
+
+export const updateStudies = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { dateEEG, dateRMNC, dateNSMAP, resEEG, resRMNC, resNSMAP } = req.body;
+
+    const study = await prisma.study.update({
+      where: { id },
+      data: {
+        dateEEG: dateEEG ? new Date(dateEEG) : undefined,
+        dateRMNC: dateRMNC ? new Date(dateRMNC) : undefined,
+        dateNSMAP: dateNSMAP ? new Date(dateNSMAP) : undefined,
+        resEEG: resEEG ?? null,
+        resRMNC: resRMNC ?? null,
+        resNSMAP: resNSMAP ?? null
+      },
+    });
+    res.json(study);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error actualizando estudio" });
   }
 };
 
