@@ -137,3 +137,4 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+backend/prisma/migrations/20260301052007_doctor_patient_relation/migration.sql
