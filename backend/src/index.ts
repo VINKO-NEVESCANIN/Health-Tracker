@@ -1,15 +1,24 @@
 import express from "express";
-import cors from "cors";
-import eventosRoutes from "./routes/event.routes";
+import userRoutes from "./routes/user.routes";
+import patientRoutes from "./routes/patient.routes";
+import appointmentRoutes from "./routes/appointment.routes";
+import crisisRoutes from "./routes/crisis.routes";
+import medicationRoutes from "./routes/medication.routes";
+import patientMedicationRoutes from "./routes/patientMedication.routes";
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
-// Rutas
-app.use("/api/eventos", eventosRoutes);
+// Rutas principales
+app.use("/users", userRoutes);
+app.use("/patients", patientRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use("/crisis", crisisRoutes);
+app.use("/medications", medicationRoutes);
+app.use("/patient-medications", patientMedicationRoutes);
 
-app.listen(4000, () => {
-  console.log("🚀 Servidor corriendo en http://localhost:4000");
+// Levantar servidor
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
