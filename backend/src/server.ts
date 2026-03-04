@@ -12,7 +12,6 @@ import appointmentRoutes from "./routes/appointment.routes";
 import medicationRoutes from "./routes/medication.routes";
 import patientMedicationRoutes from "./routes/patientMedication.routes";
 import studyRoutes from "./routes/study.routes";
-import vitalRoutes from "./routes/vital.routes";
 import crisisRoutes from "./routes/crisis.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
@@ -41,7 +40,6 @@ app.use("/appointments", appointmentRoutes);
 app.use("/medications", medicationRoutes);
 app.use("/patient-medications", patientMedicationRoutes);
 app.use("/studies", studyRoutes);
-app.use("/vitals", vitalRoutes);
 app.use("/crisis", crisisRoutes);
 
 // 🔹 Ruta raíz
