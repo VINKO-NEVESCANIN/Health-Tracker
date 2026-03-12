@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 
 import logger from "./config/logger";
-
+import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import patientRoutes from "./routes/patient.routes";
 import appointmentRoutes from "./routes/appointment.routes";
@@ -34,6 +34,7 @@ app.use(
 );
 
 // 🔹 Rutas principales
+app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/patients", patientRoutes);
 app.use("/appointments", appointmentRoutes);

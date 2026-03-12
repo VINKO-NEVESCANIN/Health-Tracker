@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, FlatList, StyleSheet, TextInput, Image, ImageBackground} from "react-native";
 import { router, useRouter } from 'expo-router';
+import { login } from "@/services/api";
 
 export default function IndexScreen() {
   const [User, setUser] = useState("");
   const [Pass, setPass] = useState("");
+  const [error, setError] = useState(""); 
   const Router = useRouter();
   
-  function lala() {
-    console.log("Bienvenido:", User)
-    Router.push({
-      pathname:'../doctor/MenuDoctor',
-      params: { 
-        user: User,
-        pass: Pass
-       }
-    });
-   }
+  async function handleLogin() {
+    try {
+      await login(User, Pass); // 👈 usamos el servicio
+      Router.push("../paciente/Pacientes"); // 👈 navega a pacientes
+    } catch (err: any) {
+      console.error("Error en login:", err.response?.data || err.message);
+      setError("Credenciales inválidas o error de conexión");
+    }
+  }
 
 
   return (
@@ -32,11 +33,14 @@ export default function IndexScreen() {
         style={{ width: 100, height: 100, alignSelf: 'center', marginBottom: 20 }}
       />
       
+      <View style={styles.container}>
+
       <TextInput
         style={styles.input}
         placeholder="Usuario"
         value={User}
         onChangeText={setUser}
+        autoCapitalize="none"
       />
 
       <TextInput
@@ -44,10 +48,12 @@ export default function IndexScreen() {
         placeholder="Contraseña"
         value={Pass}
         onChangeText={setPass}
+        secureTextEntry
       />
+      </View>
 
-      <Button title="Iniciar Sesion" onPress={lala} />
-      <Text onPress={lala} style={{alignSelf:"center", textDecorationLine:"underline"}}>
+      <Button title="Iniciar Sesion" onPress={handleLogin} />
+      <Text onPress={handleLogin} style={{alignSelf:"center", textDecorationLine:"underline"}}>
         Olvide Mi Contraseña...</Text>
     </View>
     </ImageBackground>
