@@ -7,6 +7,14 @@ export default function Pacientes() {
   const params = useLocalSearchParams();
   const condition = params.condition;
 
+  interface Patient {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender: string;
+  }
+
   const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,20 +23,23 @@ export default function Pacientes() {
   useEffect(() => {
   getPatients()
     .then(data => {
-      console.log("Pacientes recibidos:", data); // 👀 revisa en consola
-      setPatients(data);
+      console.log("Pacientes recibidos:", data);
+      setPatients(Array.isArray(data) ? data : data?.patients ?? []);
     })
-    .catch(err => console.error("Error cargando pacientes:", err));
+    .catch(err => {
+      console.error("Error cargando pacientes:", err.response?.data || err.message);
+      setError("No se pudieron cargar los pacientes");
+    })
+    .finally(() => setLoading(false));
 }, []);
 
-  // Filtrar pacientes por búsqueda
-  const filtered = patients.filter(p =>
-    p.name?.toLowerCase().includes(search.toLowerCase())
-  );
+const filtered = patients.filter(p =>
+  `${p.firstName} ${p.lastName}`.toLowerCase().includes(search.toLowerCase())
+);
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View>
         <Text>Cargando pacientes...</Text>
       </View>
     );
@@ -36,7 +47,7 @@ export default function Pacientes() {
 
   if (error) {
     return (
-      <View style={styles.center}>
+      <View>
         <Text style={{ color: "red" }}>{error}</Text>
       </View>
     );
@@ -70,9 +81,9 @@ export default function Pacientes() {
                   params: { id: item.id }
                 })}
               >
-                <Text>{item.name}</Text>
-                <Text>{item.email}</Text>
-                <Text>{item.phone}</Text>
+                <Text>{item.firstName} {item.lastName}</Text>
+                <Text>{item.email ?? 'Sin email'}</Text>
+                <Text>{item.gender ?? 'Sin género'}</Text>
               </Pressable>
             ) : (
               <Pressable
@@ -82,9 +93,9 @@ export default function Pacientes() {
                   params: { id: item.id }
                 })}
               >
-                <Text>{item.name}</Text>
-                <Text>{item.email}</Text>
-                <Text>{item.phone}</Text>
+                <Text>{item.firstName} {item.lastName}</Text>
+                <Text>{item.email ?? 'Sin email'}</Text>
+                <Text>{item.gender ?? 'Sin género'}</Text>
               </Pressable>
             )
           )}

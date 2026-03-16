@@ -25,7 +25,6 @@ export const getPatients = async () => {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // 👀 Depuración: imprime lo que devuelve el backend
     console.log("Respuesta backend pacientes:", res.data);
 
     // Si el backend devuelve { patients: [...] }

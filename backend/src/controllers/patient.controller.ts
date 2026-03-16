@@ -55,9 +55,8 @@ export const getPatients = async (req: any, res: Response) => {
     const doctorId = req.userId;
     const search = (req.query.search as string) || "";
 
-    const patients = await prisma.patient.findMany({
+    const patients = await prisma.patient.findMany({  
       where: {
-        doctorId,
         OR: [
           { firstName: { contains: search, mode: "insensitive" } },
           { lastName: { contains: search, mode: "insensitive" } },
