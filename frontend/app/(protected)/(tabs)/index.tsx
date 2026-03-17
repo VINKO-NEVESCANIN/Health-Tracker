@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, TextInput, Image, ImageBackground } from "react-native";
 import { useRouter } from 'expo-router';
 
+import fondo from '@assets/images/FondoApp.png'
+import loginIcon from '@icons/LoginIcon.png'
+
 export default function IndexScreen() {
 
   const [User, setUser] = useState("");
@@ -24,7 +27,7 @@ export default function IndexScreen() {
   return (
 
     <ImageBackground
-      source={require('../../../assets/images/FondoApp.png')}
+      source={fondo}
       style={styles.fondo}
       resizeMode="cover"
     >
@@ -32,7 +35,7 @@ export default function IndexScreen() {
       <View style={styles.container}>
 
         <Image
-          source={require('../../Icon/LoginIcon.png')}
+          source={loginIcon}
           style={styles.logo}
         />
 
@@ -66,40 +69,3 @@ export default function IndexScreen() {
 
   );
 }
-
-const styles = StyleSheet.create({
-
-  fondo: {
-    flex: 1,
-  },
-
-  container: {
-    flex: 1,
-    padding: 20,
-    marginTop: 50,
-    justifyContent: "center"
-  },
-
-  logo: {
-    width: 100,
-    height: 100,
-    alignSelf: "center",
-    marginBottom: 20
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: "#aaa",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff"
-  },
-
-  link: {
-    alignSelf: "center",
-    marginTop: 15,
-    textDecorationLine: "underline"
-  }
-
-});

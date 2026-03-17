@@ -10,7 +10,7 @@ module.exports = function(api) {
             alias: {
               '@': './',
               '@assets': './assets',
-              '@icons': './app/Icon',
+              '@icons': './app/icon',
               '@doctor': './app/(protected)/doctor',
               '@paciente': './app/(protected)/paciente'
             }
