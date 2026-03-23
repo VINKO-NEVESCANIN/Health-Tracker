@@ -1,58 +1,61 @@
 import { router } from 'expo-router';
-import {ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+
+// ✅ IMPORTS
+import fondo from '@assets/images/FondoApp.png';
+import juan from '@assets/images/JuanPaciente.jpg';
+import paciente2 from '@assets/images/Paciente2.jpg';
+import paciente3 from '@assets/images/Paciente3.jpeg';
+import paciente4 from '@assets/images/PacienteP.jpeg';
 
 export default function MisCitas() {
 
-   const items = [
-  { id: 1, name: 'Doctor 1', Fecha: '04-01-2026', Hora: '12:30 PM', Image: require('../Icon/JuanPaciente.jpg'), Resumen: 'Resumen de la Cita' },
-  { id: 2, name: 'Doctor 2', Fecha: '12-01-2026', Hora: '02:00 PM', Image: require('../Icon/Paciente2.jpg'), Resumen: 'Resumen de la Cita' },
-  { id: 3, name: 'Doctor 3', Fecha: '26-01-2026', Hora: '04:30 PM', Image: require('../Icon/Paciente3.jpeg'), Resumen: 'Resumen de la Cita' },
-  { id: 4, name: 'Doctor 4', Fecha: '02-02-2026', Hora: '07:00 PM', Image: require('../Icon/PacienteP.jpeg'), Resumen: 'Resumen de la Cita' },
-  ]
-  
-    return (
-      <ImageBackground
-         source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
-            style={styles.fondo}
-            resizeMode="cover"
-          >
+  const items = [
+    { id: 1, name: 'Doctor 1', Fecha: '04-01-2026', Hora: '12:30 PM', Image: juan, Resumen: 'Resumen de la Cita' },
+    { id: 2, name: 'Doctor 2', Fecha: '12-01-2026', Hora: '02:00 PM', Image: paciente2, Resumen: 'Resumen de la Cita' },
+    { id: 3, name: 'Doctor 3', Fecha: '26-01-2026', Hora: '04:30 PM', Image: paciente3, Resumen: 'Resumen de la Cita' },
+    { id: 4, name: 'Doctor 4', Fecha: '02-02-2026', Hora: '07:00 PM', Image: paciente4, Resumen: 'Resumen de la Cita' },
+  ];
+
+  return (
+    <ImageBackground
+      source={fondo}
+      style={styles.fondo}
+      resizeMode="cover"
+    >
       <ScrollView contentContainerStyle={styles.contenedor}>
-        
-      <FlatList
-       data={items}
-      keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.contenedor}
-      renderItem={({ item }) => (
-        <Pressable 
-        style={styles.card}
-        onPress={() => router.push({
-        pathname: '../../paciente/EditarCita',
-        params: { condition: '2',
-          id: item.id
-         }
-        })}>
-        <Image 
-          source={item.Image} // Ruta de la imagen de perfil
-          style={styles.foto}
-        /> 
-        <Text>{item.name}</Text>
-        <Text>{item.Fecha}</Text>
-        <Text>{item.Hora}</Text>
-        <Text>{item.Resumen}</Text>
-        </Pressable>
-  )}
-      />
 
-       <View style={styles.contenedor}>
-      
-    </View>
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.contenedor}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.card}
+              onPress={() => router.push({
+                pathname: '/paciente/EditarCita', // ✅ absoluta
+                params: {
+                  condition: '2',
+                  id: item.id
+                }
+              })}
+            >
+              <Image source={item.Image} style={styles.foto} />
+              <Text>{item.name}</Text>
+              <Text>{item.Fecha}</Text>
+              <Text>{item.Hora}</Text>
+              <Text>{item.Resumen}</Text>
+            </Pressable>
+          )}
+        />
 
-    </ScrollView>
-      </ImageBackground>
-    );
-  
-  }
+        <View style={styles.contenedor}></View>
+
+      </ScrollView>
+    </ImageBackground>
+  );
+}
 
    const styles = StyleSheet.create({
 
@@ -128,7 +131,7 @@ textarea: {
     marginBottom: 4,
   },
   card: {
-    alignItems: 'left',
+    alignItems: 'flex-start',
     backgroundColor: '#CEB5FF',
     padding: 16,
     borderRadius: 12,

@@ -2,6 +2,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
 import { Button } from "react-native";
 import {StyleSheet, ImageBackground, Text, View, ScrollView } from "react-native";
+import fondo from '@assets/images/FondoApp.png';
 
 export default function AgregarMedicamento() {
 
@@ -22,7 +23,7 @@ export default function AgregarMedicamento() {
       label: `Medicamento ${i + 1}`,
       value: `medicamento_${i + 1}`
     }
-  });
+  }); 
   
     const Pastillas = Array.from({ length: 23 }, (_, i) => {
       const valor = (i + 1) * 50;
@@ -50,7 +51,7 @@ export default function AgregarMedicamento() {
   };
 
   return (
-    <ImageBackground source={require("../../assets/FondoApp.png")} style={{ flex: 1 }}>
+    <ImageBackground source={fondo} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.contenedor}>
 
         <Text style={styles.title}>Medicamento:</Text>
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     padding: 10,
-    boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
+    elevation:4,
     borderRadius: 20,
     borderWidth: 2,
     marginBottom: 20,

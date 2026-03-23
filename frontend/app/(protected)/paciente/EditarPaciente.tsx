@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import fondo from '@assets/images/FondoApp.png';
 
 export default function EditarPaciente() {
 
@@ -36,7 +37,7 @@ export default function EditarPaciente() {
   }
     return (
       <ImageBackground
-         source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+         source={fondo} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >

@@ -1,12 +1,10 @@
-import { Redirect, Slot } from 'expo-router';
-import { useAuth } from '@/context/auth';
+import { AuthProvider } from '@context/auth';
+import { Slot } from 'expo-router';
 
-export default function ProtectedLayout() {
-  const { user } = useAuth();
-
-  if (!user) {
-    return <Redirect href="/login" />;
-  }
-
-  return <Slot />;
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <Slot />
+    </AuthProvider>
+  );
 }

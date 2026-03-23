@@ -1,59 +1,52 @@
-import { RelativePathString, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, Href } from "expo-router";
 import React from "react";
-import {Image, Pressable, Text, StyleSheet,View, ImageBackground, FlatList} from "react-native";
+import { Image, Pressable, Text, StyleSheet, View, ImageBackground, FlatList } from "react-native";
+
+// ✅ IMPORTS
+import loginIcon from '@assets/icon/LoginIcon.png';
+import fondo from '@assets/images/FondoApp.png';
 
 export default function MenuPaciente() {
 
-  //TIPEO DE BOTONES
-    type Boton = {
+  type Boton = {
     id: number;
     title: string;
     image: any;
-    ruta: RelativePathString;
+    ruta: Href;
   };
-  
-  //ARRAY DE BOTONES DE MENU
-    const Botones: Boton[] = [
-      { id: 1, title: 'Mis Citas', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCitas' },
-      { id: 2, title: 'Registrar Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../paciente/RegistroCrisis' },
-      { id: 3, title: 'EpileptoGrama', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/EpileptoGrama' },
-      { id: 4, title: 'Mis Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCrisis' },
-      { id: 5, title: 'Medicamentos', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/Medicamentos' },
-      { id: 6, title: 'Estudios', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/Estudios' },
-    ]
 
-  type Params = {
-  user?: string;
-};
-  const {  user } = useLocalSearchParams<Params>(); // Aquí puedes obtener los parámetros de la ruta si es necesario
+  const Botones: Boton[] = [
+    { id: 1, title: 'Mis Citas', image: loginIcon, ruta: '/paciente/MIsCitas' },
+    { id: 2, title: 'Registrar Crisis', image: loginIcon, ruta: '/paciente/RegistroCrisis' },
+    { id: 3, title: 'EpileptoGrama', image: loginIcon, ruta: '/doctor/EpileptoGrama' },
+    { id: 4, title: 'Mis Crisis', image: loginIcon, ruta: '/doctor/MisCrisis' },
+    { id: 5, title: 'Medicamentos', image: loginIcon, ruta: '/doctor/medicamentos' },
+    { id: 6, title: 'Estudios', image: loginIcon, ruta: '/doctor/estudios' },
+  ];
+
+  const { user } = useLocalSearchParams<{ user?: string }>();
 
   return (
-    <ImageBackground
-     source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
-      style={styles.fondo}
-      resizeMode="cover"
-    >
-    <View style={styles.pantalla}>
-      <FlatList
-        data={Botones}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.contenedor}
-        columnWrapperStyle={styles.fila}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.boton}
-            onPress={() => router.push(item.ruta)}
-          >
-            <Image source={item.image} style={styles.imagen} />
-            <Text style={styles.texto}>{item.title}</Text>
-          </Pressable>
-        )}
-      />
-    </View>
-        </ImageBackground>
-
-    
+    <ImageBackground source={fondo} style={styles.fondo} resizeMode="cover">
+      <View style={styles.pantalla}>
+        <FlatList
+          data={Botones}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.contenedor}
+          columnWrapperStyle={styles.fila}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.boton}
+              onPress={() => router.push(item.ruta)}
+            >
+              <Image source={item.image} style={styles.imagen} />
+              <Text style={styles.texto}>{item.title}</Text>
+            </Pressable>
+          )}
+        />
+      </View>
+    </ImageBackground>
   );
 }
 const styles = StyleSheet.create({

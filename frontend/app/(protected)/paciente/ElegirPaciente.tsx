@@ -1,6 +1,7 @@
 import { router, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Dimensions, useWindowDimensions, Pressable} from "react-native";
+import fondo from '@assets/images/FondoApp.png';
 
 export default function Pacientes() {
     const items = [
@@ -13,7 +14,7 @@ export default function Pacientes() {
 //  const { Width } = useWindowDimensions();
   return (
     <ImageBackground
-     source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+     source={fondo} // Ruta de tu imagen
       style={styles.fondo}
       resizeMode="cover"
     >
@@ -35,7 +36,7 @@ export default function Pacientes() {
     <Pressable
           style={styles.ListaPacientes}
           onPress={() => router.push({
-            pathname: '../../paciente/EditarPaciente',
+            pathname: '/paciente/EditarPaciente',
             params: { id: item.id }
           })}
         >
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     height: 120,
     padding: 10,
     boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
+    elevation: 5,
     borderRadius: 20,
     borderWidth: 2,
     marginBottom: 20,
