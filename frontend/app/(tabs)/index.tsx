@@ -13,8 +13,33 @@ export default function IndexScreen() {
   
   async function handleLogin() {
     try {
-      await login(User, Pass); // 👈 usamos el servicio
-      Router.push("../paciente/Pacientes"); // 👈 navega a pacientes
+      const Userdata = await login(User, Pass); // 👈 usamos el servicio
+      if (Userdata.user.role === "Paciente" && Userdata.user.firstTime === true) {
+        Router.push({
+      pathname:"../paciente/EditarPaciente",
+      params: { id: Userdata.user.id } // 👈 pasamos el id del paciente
+        })
+      } else if (Userdata.user.role === "Paciente" && Userdata.user.firstTime === false) {
+        Router.push({
+      pathname:"../paciente/MenuPaciente", 
+      params: { id: Userdata.user.id }}) // 👈 navega a MenuPaciente
+      } else if (Userdata.user.role === "Doctor") {
+        Router.push({
+          pathname: "../doctor/MenuDoctor",
+          params: { id: Userdata.user.id } // 👈 pasamos el id del doctor
+        }); // 👈 navega a MenuDoctor
+      }
+
+          {/*}   if (Userdata.user.role === "Paciente"  && Userdata.user.firstTime === true) {
+        Router.push({
+          pathname:"../paciente/MenuPaciente",
+          params: { patientId: Userdata.user.id } // 👈 pasamos el patientId
+        })
+        }); // 👈 navega a MenuPaciente
+      } else if (Userdata.user.role === "Doctor") {
+        Router.push("../doctor/MenuDoctor"); // 👈 navega a MenuDoctor
+      }
+   {*/}
     } catch (err: any) {
       console.error("Error en login:", err.response?.data || err.message);
       setError("Credenciales inválidas o error de conexión");
@@ -24,14 +49,14 @@ export default function IndexScreen() {
 
   return (
       <ImageBackground
-           source={fondo} // Ruta de tu imagen
+           source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >
     <View style={styles.container}>
 
       <Image
-        source={loginIcon}
+        source={require('../Icon/LoginIcon.png')}
         style={{ width: 100, height: 100, alignSelf: 'center', marginBottom: 20 }}
       />
       
@@ -54,23 +79,33 @@ export default function IndexScreen() {
       />
       </View>
 
-      <Button title="Iniciar Sesion" onPress={handleLogin} />
-      <Text onPress={handleLogin} style={{alignSelf:"center", textDecorationLine:"underline"}}>
-        Olvide Mi Contraseña...</Text>
-    </View>
+    <View style={styles.buttonContainer}>
+      <Button title="Iniciar Sesion" onPress={handleLogin} />      
+        </View>
+
+     <View style={styles.buttonContainer}>
+      <Button title="Crear Usuario" onPress={() => router.push("../../Register")} />
+      </View>   
+
+      </View>
+
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: { flex: 1, padding: 20, marginTop: 50 },
+
   title: { fontSize: 20, fontWeight: "bold", marginBottom: 20 },
+
   input: {
     borderWidth: 1,
-    borderColor: "#aaa",
+    borderColor: "#000000ff",
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    backgroundColor: '#ffffff',
   },
   item: {
     padding: 10,
@@ -79,6 +114,11 @@ const styles = StyleSheet.create({
   },
    fondo:{
     flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center"
   },
   itemText: { fontWeight: "bold" },
 });

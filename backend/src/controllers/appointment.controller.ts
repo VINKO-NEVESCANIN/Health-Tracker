@@ -4,16 +4,16 @@ import prisma from "../config/db";
 
 export const createAppointment = async (req: any, res: Response) => {
   try {
-    const { patientId, date, notes, time } = req.body;
-    if (!patientId || !date) return res.status(400).json({ error: "patientId y date requeridos" });
+    const { id, date, notes, time } = req.body;
+    if (!id || !date) return res.status(400).json({ error: "id y date requeridos" });
 
     const appointment = await prisma.appointment.create({
       data: {
-        patientId: Number(patientId),
+        patientId: Number(id),
         date: new Date(date),
         notes,
         time,
-        doctorId: req.userId,
+        doctorId: req.doctorId, // Asumiendo que doctorId viene del token
       },
     });
 
@@ -26,11 +26,10 @@ export const createAppointment = async (req: any, res: Response) => {
 
 export const getAppointments = async (req: any, res: Response) => {
   try {
-    const doctorId = req.userId;
+    const doctorId = req.doctorId;
     const appointments = await prisma.appointment.findMany({
       where: { doctorId },
       orderBy: { date: "asc" },
-      include: { patient: true },
     });
     res.json(appointments);
   } catch (err) {
