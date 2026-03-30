@@ -80,8 +80,7 @@ export const getPatient = async (req: any, res: Response) => {
         appointments: true,
         medications: { include: { medication: true } },
         studies: true,
-        crisis: true,
-        doctor: true
+        crisis: true
       },
     });
 
@@ -96,10 +95,34 @@ export const getPatient = async (req: any, res: Response) => {
 export const updatePatient = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
-    const patient = await prisma.patient.update({
+
+    console.log("Body recibido en updatePatient:", req.body);
+
+    const data = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+        gender: req.body.gender,
+        height: req.body.height,
+        weight: req.body.weight,
+        birthdate: new Date(req.body.birthdate),
+        firstCrisisDate: new Date(req.body.firstCrisisDate),
+        epilepsyType: req.body.epilepsyType,
+        anxiety: req.body.anxiety === true || req.body.anxiety === "true",
+        migraine: req.body.migraine === true || req.body.migraine === "true",
+        addictions: req.body.addictions === true || req.body.addictions === "true",
+        hypertension: req.body.hypertension === true || req.body.hypertension === "true",
+        cogniDisorder: req.body.cogniDisorder === true || req.body.cogniDisorder === "true",
+        respiDisorder: req.body.respiDisorder === true || req.body.respiDisorder === "true",
+
+      };
+
+       console.log("Data que se manda a Prisma:", data);
+
+      const patient = await prisma.patient.update({
       where: { id },
-      data: req.body,
+      data,
     });
+    
     res.json(patient);
   } catch (err) {
     console.error(err);

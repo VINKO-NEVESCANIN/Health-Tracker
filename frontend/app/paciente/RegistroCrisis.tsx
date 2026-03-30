@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { createCrisis } from "@/services/api";
 
 export default function RegistroCrisis() {
   const [duracion, setDuracion] = useState("1 Minutos");
@@ -27,6 +28,13 @@ export default function RegistroCrisis() {
       recuperacion,
       check,
     };
+    createCrisis(datos)
+      .then((res) => {
+        console.log("Crisis registrada:", res);
+      })
+      .catch((err) => {
+        console.error("Error registrando crisis:", err);
+      });
     console.log("Datos guardados:", datos);
   };
 

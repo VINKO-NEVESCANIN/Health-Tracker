@@ -4,6 +4,8 @@ import {Image, Pressable, Text, StyleSheet,View, ImageBackground, FlatList} from
 
 export default function MenuPaciente() {
 
+  const { patientId } = useLocalSearchParams();
+
   //TIPEO DE BOTONES
     type Boton = {
     id: number;
@@ -14,13 +16,13 @@ export default function MenuPaciente() {
   
   //ARRAY DE BOTONES DE MENU
     const Botones: Boton[] = [
-      { id: 1, title: 'Mis Citas', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCitas' },
-      { id: 2, title: 'Registrar Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../paciente/RegistroCrisis' },
-      { id: 3, title: 'EpileptoGrama', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/EpileptoGrama' },
-      { id: 4, title: 'Mis Crisis', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/MisCrisis' },
-      { id: 5, title: 'Medicamentos', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/Medicamentos' },
-      { id: 6, title: 'Estudios', image: require("../Icon/LoginIcon.png"), ruta: '../doctor/Estudios' },
-    ]
+      { id: 1, title: 'Mis Citas', image: require("../Icon/Mis Citas.png"), ruta: '../paciente/MIsCitas' },
+      { id: 2, title: 'Registrar Crisis', image: require("../Icon/Registrar Crisis.png"), ruta: '../paciente/RegistroCrisis' },
+      { id: 3, title: 'Epileptograma', image: require("../Icon/Epileptograma.png"), ruta: '../doctor/Epileptograma' },
+      { id: 4, title: 'Mis Crisis', image: require("../Icon/Mis Crisis.png"), ruta: '../doctor/MisCrisis' },
+      { id: 5, title: 'Medicamentos', image: require("../Icon/MisMedicamentos.png"), ruta: '../paciente/MisMedicamentos' },
+      { id: 6, title: 'Estudios', image: require("../Icon/Estudios.png"), ruta: '../paciente/EstudiosPrevios' },
+    ];
 
   type Params = {
   user?: string;
@@ -43,7 +45,7 @@ export default function MenuPaciente() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.boton}
-            onPress={() => router.push(item.ruta)}
+            onPress={() => router.push({ pathname: item.ruta, params: { patientId } })}
           >
             <Image source={item.image} style={styles.imagen} />
             <Text style={styles.texto}>{item.title}</Text>

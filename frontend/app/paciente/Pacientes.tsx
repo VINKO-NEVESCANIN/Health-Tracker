@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Pressable } from "react-native";
-import { getPatients } from "../../services/api"; // 👈 servicio axios
+import { getUsers } from "../../services/api"; // 👈 servicio axios
 
 export default function Pacientes() {
   const params = useLocalSearchParams();
@@ -21,7 +21,7 @@ export default function Pacientes() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-  getPatients()
+  getUsers()
     .then(data => {
       console.log("Pacientes recibidos:", data);
       setPatients(Array.isArray(data) ? data : data?.patients ?? []);
