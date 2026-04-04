@@ -138,3 +138,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 backend/prisma/migrations/20260301052007_doctor_patient_relation/migration.sql
+backend/prisma/migrations/20260327054413_cambio/migration.sql
+backend/prisma/migrations/20260323022605_patient_id/migration.sql
+backend/prisma/migrations/20260326054005_user_patient/migration.sql

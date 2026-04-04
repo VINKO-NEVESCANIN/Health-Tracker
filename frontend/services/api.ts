@@ -51,7 +51,7 @@ export const getUsers = async () => {
 
 export const updateInfo = async (id: number, data: any) => {
   const token = await AsyncStorage.getItem("token");
-  const res = await axios.put(`${API_URL}/patients/${id}`, data, {
+  const res = await axios.put(`${API_URL}/users/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;

@@ -95,6 +95,7 @@ export const updateInfo = async (req: any, res: Response) => {
         hypertension: req.body.hypertension === true || req.body.hypertension === "true",
         cogniDisorder: req.body.cogniDisorder === true || req.body.cogniDisorder === "true",
         respiDisorder: req.body.respiDisorder === true || req.body.respiDisorder === "true",
+        firstTime: req.body.firstTime === true || req.body.firstTime === "true",
 
       };
 

@@ -3,7 +3,7 @@ import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { getUserById, updateInfo } from '@/services/api';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function EditarPaciente() {
 
@@ -35,7 +35,7 @@ export default function EditarPaciente() {
   }
 }, [id]);
 
-  const labels = ['Nombre', 'Primer Apellido', 'Altura', 'Peso'];
+  const labels = ['Nombre', 'Apellidos', 'Altura', 'Peso'];
 
   // 5 inputs normales
   const [inputs, setInputs] = useState(Array(4).fill(''));
@@ -60,6 +60,8 @@ const Checkbox = [
   { key: "respiDisorder", label: "Trastorno respiratorio" },
 ];
 
+const firstTime = useState(false);
+
 // Estado inicial como objeto
 const [checks, setChecks] = useState<{ [k: string]: boolean }>(
   Object.fromEntries(Checkbox.map(f => [f.key, false]))
@@ -81,12 +83,17 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
       addictions: checks.addictions,
       hypertension: checks.hypertension,
       cogniDisorder: checks.cogniDisorder,
-      respiDisorder: checks.respiDisorder
+      respiDisorder: checks.respiDisorder,
+      firstTime: firstTime
     };
     try {
     const paciente = await updateInfo(idedit, datos);
     console.log("Paciente guardado:", paciente);
     alert("Paciente guardado correctamente");
+    router.push({
+      pathname: '../paciente/MenuPaciente',
+      params: { id: idedit }
+    });
   } catch (err: any) {
     console.error("Error guardando paciente:", err.response?.data || err.message);
     alert("Error al guardar paciente");
