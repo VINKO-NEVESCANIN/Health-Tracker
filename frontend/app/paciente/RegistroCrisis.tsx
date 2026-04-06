@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { createCrisis } from "@/services/api";
+import { parseQueryParams } from "expo-router/build/fork/getStateFromPath-forks";
+import { useLocalSearchParams } from "expo-router";
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegistroCrisis() {
   const [duracion, setDuracion] = useState("1 Minutos");
@@ -10,6 +14,18 @@ export default function RegistroCrisis() {
   const [fecha1, setFecha1] = useState(new Date());
   const [showFecha1, setShowFecha1] = useState(false);
   const [check, setCheck] = useState(false);
+  const [patientId, setPatientId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadToken = async () => {
+      const token = await AsyncStorage.getItem("token"); // 👈 leer token
+      if (token) {
+        const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
+        setPatientId(decoded.userId);
+      }
+    };
+    loadToken();
+  }, []);
 
   const items = Array.from({ length: 60 }, (_, i) => ({
     label: `${i + 1} Minutos`,
@@ -21,22 +37,22 @@ export default function RegistroCrisis() {
     value: `${i + 1} Minutos`,
   }));
 
-  const guardar = () => {
-    const datos = {
-      fecha1,
-      duracion,
-      recuperacion,
-      check,
-    };
-    createCrisis(datos)
-      .then((res) => {
-        console.log("Crisis registrada:", res);
-      })
-      .catch((err) => {
-        console.error("Error registrando crisis:", err);
-      });
+  const guardar = async () => {
+    try{
+    const datos = await createCrisis({
+      patientId: patientId,
+      date: fecha1,
+      duration: duracion,
+      recuperation: recuperacion,
+      unconscius: check,
+    });
     console.log("Datos guardados:", datos);
-  };
+    alert("Paciente guardado correctamente");
+  } catch (error) {
+    console.error("Error guardando datos:", error);
+    alert("Error guardando datos");
+  }
+ };
 
   return (
     <ImageBackground source={require("../../assets/FondoApp.png")} style={styles.fondo} resizeMode="cover">
@@ -71,7 +87,7 @@ export default function RegistroCrisis() {
           <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
         </View>
 
-        <Button color='#6631D7' title="Guardar" onPress={guardar} />
+        <Button color='#6631D7' title="Registrar Crisis" onPress={guardar} />
       </ScrollView>
     </ImageBackground>
   );

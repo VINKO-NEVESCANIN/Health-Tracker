@@ -1,19 +1,31 @@
 import { useState,useEffect } from 'react';
-import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import {StyleSheet,Text, ImageBackground, ScrollView, View, TextInput, Button, Switch} from 'react-native';
+import { jwtDecode } from "jwt-decode";
 import { getUserById, updateInfo } from '@/services/api';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function EditarPaciente() {
 
-  const params = useLocalSearchParams();
-  const id = params.id ? Number(params.id) : null;
-  const idedit = id;
+  const [patientId, setPatientId] = useState<number | null>(null);
 
   useEffect(() => {
-  if (id) {
-    getUserById(id)
+    const loadToken = async () => {
+      const token = await AsyncStorage.getItem("token"); // 👈 leer token
+      if (token) {
+        const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
+        setPatientId(decoded.userId);
+      }
+    };
+    loadToken();
+  }, []);
+
+  useEffect(() => {
+  if (patientId) {
+    getUserById(patientId)
       .then(p => {
         // 👇 llena tus estados con los datos del backend
         setInputs([p.firstName, p.lastName, String(p.height), String(p.weight)]);
@@ -33,7 +45,9 @@ export default function EditarPaciente() {
       })
       .catch(err => console.error("Error cargando paciente:", err));
   }
-}, [id]);
+
+}, [patientId]);
+
 
   const labels = ['Nombre', 'Apellidos', 'Altura', 'Peso'];
 
@@ -87,12 +101,11 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
       firstTime: firstTime
     };
     try {
-    const paciente = await updateInfo(idedit, datos);
+    const paciente = await updateInfo(patientId, datos);
     console.log("Paciente guardado:", paciente);
     alert("Paciente guardado correctamente");
     router.push({
       pathname: '../paciente/MenuPaciente',
-      params: { id: idedit }
     });
   } catch (err: any) {
     console.error("Error guardando paciente:", err.response?.data || err.message);
