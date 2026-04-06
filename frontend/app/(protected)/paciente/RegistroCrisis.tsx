@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import fondo from '@assets/images/FondoApp.png';
+import { createCrisis } from "@/services/api";
 
 export default function RegistroCrisis() {
   const [duracion, setDuracion] = useState("1 Minutos");
@@ -28,14 +28,18 @@ export default function RegistroCrisis() {
       recuperacion,
       check,
     };
+    createCrisis(datos)
+      .then((res) => {
+        console.log("Crisis registrada:", res);
+      })
+      .catch((err) => {
+        console.error("Error registrando crisis:", err);
+      });
     console.log("Datos guardados:", datos);
   };
 
   return (
-    <ImageBackground 
-      source={fondo} 
-      style={styles.fondo} 
-      resizeMode="cover">
+    <ImageBackground source={require("../../assets/FondoApp.png")} style={styles.fondo} resizeMode="cover">
       <ScrollView contentContainerStyle={styles.contenedor}>
         <Text style={styles.title}>Fecha de la crisis:</Text>
         <Button color='#6631D7' title={fecha1.toLocaleDateString()} onPress={() => setShowFecha1(true)} />

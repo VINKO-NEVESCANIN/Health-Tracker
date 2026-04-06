@@ -1,52 +1,91 @@
-import { router, useLocalSearchParams, Href } from "expo-router";
+import { RelativePathString, router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Image, Pressable, Text, StyleSheet, View, ImageBackground, FlatList } from "react-native";
-
-// ✅ IMPORTS
-import loginIcon from '@assets/icon/LoginIcon.png';
-import fondo from '@assets/images/FondoApp.png';
+import {Image, Pressable, Text, StyleSheet,View, ImageBackground, FlatList} from "react-native";
 
 export default function MenuPaciente() {
 
-  type Boton = {
+  const { patientId } = useLocalSearchParams();
+
+  //TIPEO DE BOTONES
+    type Boton = {
     id: number;
     title: string;
     image: any;
-    ruta: Href;
+    ruta: RelativePathString;
   };
+  
+  //ARRAY DE BOTONES DE MENU
+    const Botones: Boton[] = [
+  {
+    id: 1,
+    title: 'Mis Citas',
+    image: require("../../../assets/icon/MisCitas.png"),
+    ruta: '../paciente/MisCitas'
+  },
+  {
+    id: 2,
+    title: 'Registrar Crisis',
+    image: require("../../../assets/icon/RegistrarCrisis.png"),
+    ruta: '../paciente/RegistroCrisis'
+  },
+  {
+    id: 3,
+    title: 'Epileptograma',
+    image: require("../../../assets/icon/Epileptograma.png"),
+    ruta: '../doctor/Epileptograma'
+  },
+  {
+    id: 4,
+    title: 'Mis Crisis',
+    image: require("../../../assets/icon/MisCrisis.png"),
+    ruta: '../doctor/MisCrisis'
+  },
+  {
+    id: 5,
+    title: 'Medicamentos',
+    image: require("../../../assets/icon/MisMedicamentos.png"),
+    ruta: '../paciente/MisMedicamentos'
+  },
+  {
+    id: 6,
+    title: 'Estudios',
+    image: require("../../../assets/icon/Estudios.png"),
+    ruta: '../paciente/EstudiosPrevios'
+  },
+];
 
-  const Botones: Boton[] = [
-    { id: 1, title: 'Mis Citas', image: loginIcon, ruta: '/paciente/MIsCitas' },
-    { id: 2, title: 'Registrar Crisis', image: loginIcon, ruta: '/paciente/RegistroCrisis' },
-    { id: 3, title: 'EpileptoGrama', image: loginIcon, ruta: '/doctor/EpileptoGrama' },
-    { id: 4, title: 'Mis Crisis', image: loginIcon, ruta: '/doctor/MisCrisis' },
-    { id: 5, title: 'Medicamentos', image: loginIcon, ruta: '/doctor/medicamentos' },
-    { id: 6, title: 'Estudios', image: loginIcon, ruta: '/doctor/estudios' },
-  ];
-
-  const { user } = useLocalSearchParams<{ user?: string }>();
+  type Params = {
+  user?: string;
+};
+  const {  user } = useLocalSearchParams<Params>(); // Aquí puedes obtener los parámetros de la ruta si es necesario
 
   return (
-    <ImageBackground source={fondo} style={styles.fondo} resizeMode="cover">
-      <View style={styles.pantalla}>
-        <FlatList
-          data={Botones}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.contenedor}
-          columnWrapperStyle={styles.fila}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.boton}
-              onPress={() => router.push(item.ruta)}
-            >
-              <Image source={item.image} style={styles.imagen} />
-              <Text style={styles.texto}>{item.title}</Text>
-            </Pressable>
-          )}
-        />
-      </View>
-    </ImageBackground>
+    <ImageBackground
+     source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+      style={styles.fondo}
+      resizeMode="cover"
+    >
+    <View style={styles.pantalla}>
+      <FlatList
+        data={Botones}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        contentContainerStyle={styles.contenedor}
+        columnWrapperStyle={styles.fila}
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.boton}
+            onPress={() => router.push({ pathname: item.ruta, params: { patientId } })}
+          >
+            <Image source={item.image} style={styles.imagen} />
+            <Text style={styles.texto}>{item.title}</Text>
+          </Pressable>
+        )}
+      />
+    </View>
+        </ImageBackground>
+
+    
   );
 }
 const styles = StyleSheet.create({

@@ -1,15 +1,11 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Pressable } from "react-native";
-import { getPatients } from "../../../services/api";
-import fondo from '@assets/images/FondoApp.png';
+import { getUsers } from "../../services/api"; // 👈 servicio axios
 
 export default function Pacientes() {
   const params = useLocalSearchParams();
   const condition = params.condition;
-
-  // ✅ condición limpia
-  const isEditarCita = String(condition) === '1';
 
   interface Patient {
     id: number;
@@ -25,23 +21,22 @@ export default function Pacientes() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getPatients()
-      .then(data => {
-        console.log("Pacientes recibidos:", data);
-        setPatients(Array.isArray(data) ? data : data?.patients ?? []);
-      })
-      .catch(err => {
-        console.error("Error cargando pacientes:", err.response?.data || err.message);
-        setError("No se pudieron cargar los pacientes");
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  getUsers()
+    .then(data => {
+      console.log("Pacientes recibidos:", data);
+      setPatients(Array.isArray(data) ? data : data?.patients ?? []);
+    })
+    .catch(err => {
+      console.error("Error cargando pacientes:", err.response?.data || err.message);
+      setError("No se pudieron cargar los pacientes");
+    })
+    .finally(() => setLoading(false));
+}, []);
 
-  const filtered = patients.filter(p =>
-    `${p.firstName} ${p.lastName}`.toLowerCase().includes(search.toLowerCase())
-  );
+const filtered = patients.filter(p =>
+  `${p.firstName} ${p.lastName}`.toLowerCase().includes(search.toLowerCase())
+);
 
-  // ⏳ loading
   if (loading) {
     return (
       <View>
@@ -50,7 +45,6 @@ export default function Pacientes() {
     );
   }
 
-  // ❌ error
   if (error) {
     return (
       <View>
@@ -61,12 +55,11 @@ export default function Pacientes() {
 
   return (
     <ImageBackground
-      source={fondo}
+      source={require('../../assets/FondoApp.png')}
       style={styles.fondo}
       resizeMode="cover"
     >
       <View style={styles.pantalla}>
-
         <TextInput
           style={styles.input}
           placeholder="Buscar Paciente"
@@ -80,22 +73,33 @@ export default function Pacientes() {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.contenedor}
           renderItem={({ item }) => (
-            <Pressable
-              style={styles.ListaPacientes}
-              onPress={() => router.push({
-                pathname: isEditarCita
-                  ? '/paciente/EditarCita'
-                  : '/paciente/EditarPaciente',
-                params: { id: item.id }
-              })}
-            >
-              <Text>{item.firstName} {item.lastName}</Text>
-              <Text>{item.email ?? 'Sin email'}</Text>
-              <Text>{item.gender ?? 'Sin género'}</Text>
-            </Pressable>
+            condition === '1' ? (
+              <Pressable
+                style={styles.ListaPacientes}
+                onPress={() => router.push({
+                  pathname: '../../paciente/EditarCita',
+                  params: { id: item.id }
+                })}
+              >
+                <Text>{item.firstName} {item.lastName}</Text>
+                <Text>{item.email ?? 'Sin email'}</Text>
+                <Text>{item.gender ?? 'Sin género'}</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.ListaPacientes}
+                onPress={() => router.push({
+                  pathname: '../../paciente/EditarPaciente',
+                  params: { id: item.id }
+                })}
+              >
+                <Text>{item.firstName} {item.lastName}</Text>
+                <Text>{item.email ?? 'Sin email'}</Text>
+                <Text>{item.gender ?? 'Sin género'}</Text>
+              </Pressable>
+            )
           )}
         />
-
       </View>
     </ImageBackground>
   );
@@ -103,7 +107,6 @@ export default function Pacientes() {
 
 const styles = StyleSheet.create({
   fondo: { flex: 1 },
-
   ListaPacientes: {
     backgroundColor: '#C9B1FF',
     justifyContent: 'center',
@@ -114,18 +117,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginBottom: 20,
   },
-
   pantalla: {
     flex: 1,
     paddingTop: 40,
   },
-
   contenedor: {
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
-
   input: {
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: "#000000ff",
     padding: 12,

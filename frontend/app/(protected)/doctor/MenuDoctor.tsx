@@ -1,35 +1,36 @@
-import { useLocalSearchParams, useRouter, Href } from "expo-router";
-import React, { useState } from "react";
+import { RelativePathString, useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import { Image, Pressable, Text, StyleSheet, View, ImageBackground, FlatList } from "react-native";
 
-// ✅ IMPORTS CORRECTOS
-import loginIcon from '@assets/icon/LoginIcon.png';
-import fondo from '@assets/images/FondoApp.png';
+// ✅ IMPORTS DE IMÁGENES
+import fondo from "@assets/images/FondoApp.png";
+import gestionarCitas from "@assets/icon/GestionarCitas.png";
+import pacientesIcon from "@assets/icon/Pacientes.png";
+import crisisIcon from "@assets/icon/CrisisRecientes.png";
+import epileptoIcon from "@assets/icon/Epileptograma.png";
+import { Href } from "expo-router";
 
 export default function MenuDoctor() {
 
   type Boton = {
-    id: number;
-    title: string;
-    image: any;
-    ruta: Href;
-  };
+  id: number;
+  title: string;
+  image: any;
+  ruta: Href; //  Clave de funcionamiento
+};
 
+  // ✅ BOTONES LIMPIOS
   const Botones: Boton[] = [
-    { id: 1, title: 'Gestionar Cita', image: loginIcon, ruta: '/doctor/GestionarCitas' },
-    { id: 2, title: 'Pacientes', image: loginIcon, ruta: '/paciente/Pacientes' },
-    { id: 3, title: 'Crisis Recientes', image: loginIcon, ruta: '/doctor/CrisisRecientes' },
-    { id: 4, title: 'EpileptoGrama', image: loginIcon, ruta: '/doctor/EpileptoGrama' },
+    { id: 1, title: 'Gestionar Cita', image: gestionarCitas, ruta: '/doctor/GestionarCitas' },
+    { id: 2, title: 'Pacientes', image: pacientesIcon, ruta: '/paciente/Pacientes' },
+    { id: 3, title: 'Crisis Recientes', image: crisisIcon, ruta: '/doctor/CrisisRecientes' },
+    { id: 4, title: 'Epileptograma', image: epileptoIcon, ruta: '/doctor/EpileptoGrama' },
   ];
 
   const router = useRouter();
-  const [User, setUser] = useState("");
 
-  type Params = {
-    user?: string;
-  };
-
-  const { user } = useLocalSearchParams<Params>();
+  // (opcional si usas params)
+  const { user } = useLocalSearchParams<{ user?: string }>();
 
   return (
     <ImageBackground
@@ -47,7 +48,7 @@ export default function MenuDoctor() {
           renderItem={({ item }) => (
             <Pressable
               style={styles.boton}
-              onPress={() => router.push(item.ruta as any)}
+              onPress={() => router.push(item.ruta)}
             >
               <Image source={item.image} style={styles.imagen} />
               <Text style={styles.texto}>{item.title}</Text>
@@ -58,8 +59,9 @@ export default function MenuDoctor() {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
-  fondo:{
+  fondo: {
     flex: 1,
   },
   pantalla: {
@@ -81,9 +83,8 @@ const styles = StyleSheet.create({
     width: '48%',
     height: 120,
     padding: 10,
-    boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
     borderRadius: 20,
-    borderWidth: 2
+    borderWidth: 2,
   },
   imagen: {
     width: 70,
@@ -92,8 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   texto: {
-    color: 'Black',
+    color: 'black',
     fontSize: 16,
-      }
-
+  }
 });

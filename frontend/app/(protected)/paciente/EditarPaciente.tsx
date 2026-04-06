@@ -1,15 +1,45 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import fondo from '@assets/images/FondoApp.png';
+import { getUserById, updateInfo } from 'services/api';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function EditarPaciente() {
 
-  const labels = ['Nombre', 'Primer Apellido', 'Segundo Apellido', 'Altura', 'Peso'];
+  const params = useLocalSearchParams();
+  const id = params.id ? Number(params.id) : null;
+  const idedit = id;
+
+  useEffect(() => {
+  if (id) {
+    getUserById(id)
+      .then(p => {
+        // 👇 llena tus estados con los datos del backend
+        setInputs([p.firstName, p.lastName, String(p.height), String(p.weight)]);
+        setFecha1(new Date(p.birthdate));
+        setFecha2(new Date(p.firstCrisisDate));
+        setGenero(p.gender);
+        setEpilepsyType(p.epilepsyType);
+        setChecks({
+          anxiety: p.anxiety,
+          migraine: p.migraine,
+          addictions: p.addictions,
+          hypertension: p.hypertension,
+          cogniDisorder: p.cogniDisorder,
+          respiDisorder: p.respiDisorder,
+      });
+      })
+      .catch(err => 
+        console.error("Error cargando paciente:", err)
+      );
+  }
+}, [id]);
+
+  const labels = ['Nombre', 'Primer Apellido', 'Altura', 'Peso'];
 
   // 5 inputs normales
-  const [inputs, setInputs] = useState(Array(5).fill(''));
+  const [inputs, setInputs] = useState(Array(4).fill(''));
 
   // 2 fechas
   const [fecha1, setFecha1] = useState(new Date());
@@ -18,26 +48,58 @@ export default function EditarPaciente() {
   const [showFecha2, setShowFecha2] = useState(false);
 
   // 2 selectores
-  const [opcion1, setOpcion1] = useState('A');
-  const [opcion2, setOpcion2] = useState('X');
+  const [genero, setGenero] = useState('A');
+  const [epilepsyType, setEpilepsyType] = useState('X');
 
   // 7 checkboxes (Switch)
-  const [checks, setChecks] = useState(Array(7).fill(false));
+const Checkbox = [
+  { key: "anxiety", label: "Ansiedad" },
+  { key: "migraine", label: "Migraña" },
+  { key: "addictions", label: "Adicciones" },
+  { key: "hypertension", label: "Hipertensión" },
+  { key: "cogniDisorder", label: "Trastorno cognitivo" },
+  { key: "respiDisorder", label: "Trastorno respiratorio" },
+];
 
-  const guardar = () => {
+// Estado inicial como objeto
+const [checks, setChecks] = useState<{ [k: string]: boolean }>(
+  Object.fromEntries(Checkbox.map(f => [f.key, false]))
+);
+
+
+  const guardar = async () => {
+    if (!idedit) {
+        alert("ID inválido");
+        return;
+      }
     const datos = {
-      inputs,
-      fecha1,
-      fecha2,
-      opcion1,
-      opcion2,
-      checks,
+      firstName: inputs[0],
+      lastName: inputs[1],
+      height: inputs[2],
+      weight: inputs[3],
+      birthdate: fecha1,
+      firstCrisisDate: fecha2,
+      gender: genero,
+      epilepsyType: epilepsyType,
+      anxiety: checks.anxiety,
+      migraine: checks.migraine,
+      addictions: checks.addictions,
+      hypertension: checks.hypertension,
+      cogniDisorder: checks.cogniDisorder,
+      respiDisorder: checks.respiDisorder
     };
-    console.log('Datos guardados:', datos);
+    try {
+    const paciente = await updateInfo(idedit, datos);
+    console.log("Paciente guardado:", paciente);
+    alert("Paciente guardado correctamente");
+  } catch (err: any) {
+    console.error("Error guardando paciente:", err.response?.data || err.message);
+    alert("Error al guardar paciente");
+  }
   }
     return (
       <ImageBackground
-         source={fondo} // Ruta de tu imagen
+         source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >
@@ -68,7 +130,7 @@ export default function EditarPaciente() {
 
       {/* Selector Genero */}
       <Text>Genero:</Text>
-      <Picker selectedValue={opcion1} onValueChange={setOpcion1}>
+      <Picker selectedValue={genero} onValueChange={setGenero}>
         <Picker.Item label="Masculino" value="Masculino" />
         <Picker.Item label="Femenino" value="Femenino" />
         <Picker.Item label="Otro" value="Otro" />
@@ -100,8 +162,8 @@ export default function EditarPaciente() {
         onCancel={() => setShowFecha2(false)}
       />
       {/* Selector 1 */}
-      <Text>Opción 2:</Text>
-      <Picker selectedValue={opcion2} onValueChange={setOpcion2}>
+      <Text>Tipo de epilepsia:</Text>
+      <Picker selectedValue={epilepsyType} onValueChange={setEpilepsyType}>
         <Picker.Item label="Valor X" value="X" />
         <Picker.Item label="Valor Y" value="Y" />
         <Picker.Item label="Valor Z" value="Z" />
@@ -109,21 +171,23 @@ export default function EditarPaciente() {
 
       {/* 7 checkboxes con Switch */}
       <Text style={styles.subtitulo}>Selecciona opciones:</Text>
-      {checks.map((valor, index) => (
-        <View key={index} style={styles.checkboxContainer}>
+      {Checkbox.map(field => (
+        <View key={field.key} style={styles.switchCard}>
+          <Text style={styles.switchLabel}>{field.label}</Text>
           <Switch
-            value={valor}
-            onValueChange={(nuevo) => {
-              const nuevos = [...checks];
-              nuevos[index] = nuevo;
-              setChecks(nuevos);
-            }}
-          />
-          <Text>Opción {index + 1}</Text>
-        </View>
-      ))}
+            value={checks[field.key]}
+      onValueChange={(nuevo) =>
+        setChecks(prev => ({ ...prev, [field.key]: nuevo }))
+      }
+      trackColor={{ false: "#ccc", true: "#7B61FF" }}
+      thumbColor={checks[field.key] ? "#fff" : "#f4f3f4"}
+    />
+  </View>
+))}
 
-      <Button title="Guardar" onPress={guardar} />
+
+
+      <Button title="Guardar" onPress={guardar}/>
     </ScrollView>
       </ImageBackground>
     );
@@ -152,6 +216,22 @@ export default function EditarPaciente() {
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
+
+  switchCard: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '#ffffff',
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 10,
+},
+
+switchLabel: {
+  fontSize: 16,
+  color: '#000',
+},
+
   fila: {
     justifyContent: 'space-between',
     marginBottom: 20,
