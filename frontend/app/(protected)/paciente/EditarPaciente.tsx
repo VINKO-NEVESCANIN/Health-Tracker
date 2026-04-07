@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { getUserById, updateInfo } from 'services/api';
 import { useLocalSearchParams } from 'expo-router';
+import fondo from '@assets/images/FondoApp.png';
 
 export default function EditarPaciente() {
 
@@ -99,7 +100,7 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
   }
     return (
       <ImageBackground
-         source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+         source={fondo} // Ruta adsoluta de la imagen
             style={styles.fondo}
             resizeMode="cover"
           >

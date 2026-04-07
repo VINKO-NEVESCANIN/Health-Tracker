@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, Text, Button, StyleSheet, TextInput, ImageBackground} from "react-native";
 import {useRouter } from 'expo-router';
-import { createUser} from "@/services/api";
+import { createUser} from "@services/api";
+import fondo from '@assets/images/FondoApp.png';
 
 export default function IndexScreen() {
   const [User, setUser] = useState("");
@@ -34,7 +35,7 @@ export default function IndexScreen() {
 
   return (
       <ImageBackground
-           source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+           source={fondo} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >

@@ -1,7 +1,9 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text, TextInput, Pressable } from "react-native";
-import { getUsers } from "../../services/api"; // 👈 servicio axios
+import { getUsers } from "@services/api"; // Ruta absoluta a tu servicio de API
+//import fondo from '@assets/FondoApp.png';
+import fondo from '@assets/images/FondoApp.png';
 
 export default function Pacientes() {
   const params = useLocalSearchParams();
@@ -55,7 +57,7 @@ const filtered = patients.filter(p =>
 
   return (
     <ImageBackground
-      source={require('../../assets/FondoApp.png')}
+      source={fondo}
       style={styles.fondo}
       resizeMode="cover"
     >

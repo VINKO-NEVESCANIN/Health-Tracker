@@ -49,14 +49,14 @@ export default function IndexScreen() {
 
   return (
       <ImageBackground
-           source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+           source={fondo} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >
     <View style={styles.container}>
 
       <Image
-        source={require('../Icon/LoginIcon.png')}
+        source={loginIcon}
         style={{ width: 100, height: 100, alignSelf: 'center', marginBottom: 20 }}
       />
       

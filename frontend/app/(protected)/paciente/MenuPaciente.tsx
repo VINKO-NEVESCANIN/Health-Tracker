@@ -1,6 +1,7 @@
 import { RelativePathString, router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {Image, Pressable, Text, StyleSheet,View, ImageBackground, FlatList} from "react-native";
+import fondo from '@assets/images/FondoApp.png';
 
 export default function MenuPaciente() {
 
@@ -61,7 +62,7 @@ export default function MenuPaciente() {
 
   return (
     <ImageBackground
-     source={require('../../assets/FondoApp.png')} // Ruta de tu imagen
+     source={fondo} // Ruta de tu imagen
       style={styles.fondo}
       resizeMode="cover"
     >
