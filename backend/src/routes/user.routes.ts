@@ -6,6 +6,7 @@ import {
   updateInfo,
   updateAccess,
   deleteUser,
+  getUserByDoctorId,
 } from "../controllers/user.controller";
 
 const router = Router();
@@ -16,5 +17,6 @@ router.post("/", createUser);
 router.put("/:id", updateInfo);
 router.put("/:id", updateAccess);
 router.delete("/:id", deleteUser);
+router.get("/doctor/:doctorId", getUserByDoctorId);
 
 export default router;

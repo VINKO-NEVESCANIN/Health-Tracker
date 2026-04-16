@@ -59,6 +59,25 @@ try{
 }
 };
 
+export const getUserByDoctorId = async (req: Request, res: Response) => {
+  try {
+    const doctorId = Number(req.params.doctorId);
+    const user = await prisma.user.findMany({
+      where: { doctorId },
+      include: {
+        appointments: true,
+        crisis: true,
+        medications: { include: { medication: true } },
+        studies: true
+      }
+    });
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo usuario" });
+  }
+};
+
 export const updateAccess = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role } = req.body;
   const user = await prisma.user.update({
