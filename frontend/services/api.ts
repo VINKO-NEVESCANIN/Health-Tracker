@@ -120,3 +120,19 @@ export const getUserByDoctorId = async (doctorId: number) => {
   });
   return res.data;
 };
+
+export const getMedications = async () => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/medications`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const createPatientMedication = async (data: any) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.post(`${API_URL}/patient-medications`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
