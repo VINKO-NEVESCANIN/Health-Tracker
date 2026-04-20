@@ -75,7 +75,7 @@ export default function AgregarMedicamento() {
         patientId: patientId,
         medicationId: selectMeds,
         dose: Gramaje.toString(),
-        interval: Frecuencia,
+        interval: Frecuencia.toString(),
         name: nombreMedicamento,
         presentation: Presentacion,
       });

@@ -136,3 +136,19 @@ export const createPatientMedication = async (data: any) => {
   });
   return res.data;
 };
+
+export const getPatientMedications = async (patientId: number) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/patient-medications/${patientId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const deletePatientMedication = async (id: number) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.delete(`${API_URL}/patient-medications/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
