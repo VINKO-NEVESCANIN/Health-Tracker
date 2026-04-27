@@ -4,7 +4,7 @@ import prisma from "../config/db";
 
 export const createCrisis = async (req: Request, res: Response) => {
   try {
-    const {patientId, date, duration, recuperation, unconscius } = req.body;
+    const {patientId, date, duration, recuperation, unconscius, medication } = req.body;
 
     const durationInt = parseInt(duration);
     const recuperationInt = parseInt(recuperation);
@@ -16,6 +16,7 @@ export const createCrisis = async (req: Request, res: Response) => {
         duration: durationInt ?? null,
         recuperation: recuperationInt ?? null,
         unconscius: unconscius === true || unconscius === "true",
+        medication: medication ?? null,
       },
     });
 
@@ -53,5 +54,30 @@ export const getDateCrisis = async (req: any, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error obteniendo crisis" });
+  }
+};
+
+export const getPatientCrisis = async (req: Request, res: Response) => {
+  try {
+    const patientId = Number(req.params.patientId);
+    if (isNaN(patientId)) {
+      return res.status(400).json({ error: "patientId inválido" });
+    }
+
+    // 👇 extraer la fecha desde query
+    const { crisisDate } = req.query;
+
+    const items = await prisma.crisis.findMany({
+      where: {
+        patientId,
+        ...(crisisDate ? { crisisDate: new Date(crisisDate as string) } : {}),
+      },
+      orderBy: { crisisDate: "asc" }, // opcional: ordenar por fecha
+    });
+
+    res.json(items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo crisis del paciente" });
   }
 };

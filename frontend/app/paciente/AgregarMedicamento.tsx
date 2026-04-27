@@ -38,6 +38,7 @@ export default function AgregarMedicamento() {
     const [Frecuencia, setFrecuencia] = useState("");
     const nombreMedicamento = Medications.find(item => item.id === selectMeds)?.name;
     const [patientId, setPatientId] = useState<number | null>(null);
+    const abbreviation = Medications.find(item => item.id === selectMeds)?.abbreviation;
 
     const Presentaciones = [
       { label: "Tabletas", value: "Tabletas" },
@@ -78,6 +79,7 @@ export default function AgregarMedicamento() {
         interval: Frecuencia.toString(),
         name: nombreMedicamento,
         presentation: Presentacion,
+        abbreviation: abbreviation
       });
       router.push("/paciente/MisMedicamentos");
       console.log("Datos guardados:", datos);
@@ -102,6 +104,7 @@ export default function AgregarMedicamento() {
                     key={item.id} 
                     label={item.name} 
                     value={item.id} />
+
                   ))}
                 </Picker>
 

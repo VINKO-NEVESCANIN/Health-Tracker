@@ -152,3 +152,11 @@ export const deletePatientMedication = async (id: number) => {
   });
   return res.data;
 };
+
+export const getPatientCrisis = async (patientId: number) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/crisis/patients/${patientId}/crisis`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
