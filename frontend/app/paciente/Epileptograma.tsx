@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, ImageBackground } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { getPatientCrisis } from "@/services/api";
+import { getDateCrisisByRange, getPatientCrisis } from "@/services/api";
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams } from "expo-router";
 
 export default function LineaDeCrisis() {
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [eventos, setEventos] = useState([]);
   const [patientId, setPatientId] = useState<number | null>(null);
-  const [showFechaSeleccionada, setShowFechaSeleccionada] = useState(false);
-  const {fecha1, fecha2} = useLocalSearchParams<{fecha1: string, fecha2: string}>();
+  const {startDate, endDate} = useLocalSearchParams<{startDate: string, endDate: string}>();
+  const [primeraCrisis, setPrimeraCrisis] = useState<string | null>(null);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -19,6 +18,7 @@ export default function LineaDeCrisis() {
       if (token) {
         const decoded = jwtDecode<{ userId: number }>(token);
         setPatientId(decoded.userId);
+        console.log("Token cargado, patientId:", startDate, endDate);
       }
     };
     loadToken();
@@ -28,14 +28,27 @@ export default function LineaDeCrisis() {
     if (!patientId) return;
     const cargar = async () => {
       try {
-        const data = await getPatientCrisis(patientId);
+        const todas = await getPatientCrisis(patientId);
+        if(todas.length > 0){
+          const primera = todas.sort((a, b) => 
+          new Date(a.crisisDate).getTime() - new Date(b.crisisDate).getTime())[0];
+          setPrimeraCrisis(primera.crisisDate);
+        }
+
+        const data = await getDateCrisisByRange(patientId, new Date(startDate), new Date(endDate));
         setEventos(data);
       } catch (err: any) {
         console.error("Error cargando crisis:", err.response?.data || err.message);
       }
     };
     cargar();
-  }, [patientId]);
+  }, [patientId, startDate, endDate]);
+
+  const formatFecha = (date: Date) => {
+  const tzOffset = date.getTimezoneOffset() * 60000;
+  const localISO = new Date(date.getTime() - tzOffset).toISOString().split("T")[0];
+  return localISO;
+};
 
   return (
     <ImageBackground
@@ -44,19 +57,6 @@ export default function LineaDeCrisis() {
     >
       <View style={{ flex: 1, padding: 20 }}>
         <Text style={styles.title}>Línea de Crisis</Text>
-
-    {showFechaSeleccionada && ( 
-        <DateTimePicker
-          value={fechaSeleccionada}
-          mode="date"
-          display="default"
-          onChange={(eventos, date) => {
-            setShowFechaSeleccionada(false);
-            if (date) setFechaSeleccionada(date);
-            
-          }}
-        />
-        )}
 
         <ScrollView horizontal contentContainerStyle={styles.timeline}>
           <View style={styles.lineBase} />
@@ -70,12 +70,13 @@ export default function LineaDeCrisis() {
               let icon = "▲";
               let color = "gray";
 
-              if (index === 0) {
+              if (primeraCrisis && new Date(ev.crisisDate).getTime() === new Date(primeraCrisis).getTime()) {
                 color = "yellow"; // primera crisis
               } else {
                 const prev = arr[index - 1];
-                if (ev.medication !== prev.medication) {
+                if (prev && ev.medication !== prev.medication) {
                   color = "red"; // cambio de medicamento
+                  console.log("Cambio de medicamento detectado en crisis:", primeraCrisis);
                 }
               }
 
