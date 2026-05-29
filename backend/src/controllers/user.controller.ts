@@ -3,7 +3,7 @@ import prisma from "../config/db";
 import bcrypt from "bcrypt";
 
 export const createUser = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, createdAt, role } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
 
   if (!password) return res.status(400).json({ error: "password requerido" });
   const hashedPassword = await bcrypt.hash(password, 10);

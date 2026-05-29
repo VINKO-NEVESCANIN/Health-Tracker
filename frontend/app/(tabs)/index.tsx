@@ -13,33 +13,23 @@ export default function IndexScreen() {
   
   async function handleLogin() {
     try {
-      const Userdata = await login(User, Pass); // 👈 usamos el servicio
+      const Userdata = await login(User, Pass); // Usamos el servicio
       if (Userdata.user.role === "Paciente" && Userdata.user.firstTime === true) {
         Router.push({
-      pathname:"../paciente/EditarPaciente",
-      params: { id: Userdata.user.id } // 👈 pasamos el id del paciente
-        })
+
+
+       pathname:"../paciente/EditarPaciente"})
       } else if (Userdata.user.role === "Paciente" && Userdata.user.firstTime === false) {
         Router.push({
-      pathname:"../paciente/MenuPaciente", 
-      params: { id: Userdata.user.id }}) // 👈 navega a MenuPaciente
+      
+       pathname:"../paciente/MenuPaciente"}) // 👈 navega a MenuPaciente
       } else if (Userdata.user.role === "Doctor") {
         Router.push({
-          pathname: "../doctor/MenuDoctor",
-          params: { id: Userdata.user.id } // 👈 pasamos el id del doctor
-        }); // 👈 navega a MenuDoctor
-      }
 
-          {/*}   if (Userdata.user.role === "Paciente"  && Userdata.user.firstTime === true) {
-        Router.push({
-          pathname:"../paciente/MenuPaciente",
-          params: { patientId: Userdata.user.id } // 👈 pasamos el patientId
-        })
-        }); // 👈 navega a MenuPaciente
-      } else if (Userdata.user.role === "Doctor") {
-        Router.push("../doctor/MenuDoctor"); // 👈 navega a MenuDoctor
+
+        pathname: "../doctor/MenuDoctor"}); // 👈 navega a MenuDoctor
       }
-   {*/}
+      
     } catch (err: any) {
       console.error("Error en login:", err.response?.data || err.message);
       setError("Credenciales inválidas o error de conexión");
