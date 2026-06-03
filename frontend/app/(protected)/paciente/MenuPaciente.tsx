@@ -1,11 +1,24 @@
 import { RelativePathString, router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {Image, Pressable, Text, StyleSheet,View, ImageBackground, FlatList} from "react-native";
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import fondo from '@assets/images/FondoApp.png';
 
 export default function MenuPaciente() {
 
-  const { patientId } = useLocalSearchParams();
+  const [patientId, setPatientId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadToken = async () => {
+      const token = await AsyncStorage.getItem("token"); // 👈 leer token
+      if (token) {
+        const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
+        setPatientId(decoded.userId);
+      }
+    };
+    loadToken();
+  }, []);
 
   //TIPEO DE BOTONES
     type Boton = {
@@ -76,7 +89,7 @@ export default function MenuPaciente() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.boton}
-            onPress={() => router.push({ pathname: item.ruta, params: { patientId } })}
+            onPress={() => router.push({ pathname: item.ruta })}
           >
             <Image source={item.image} style={styles.imagen} />
             <Text style={styles.texto}>{item.title}</Text>

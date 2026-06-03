@@ -10,7 +10,7 @@ export const login = async (email: string, password: string) => {
   const {token, user} = res.data;
 
   // Guardar token en AsyncStorage
-  await AsyncStorage.setItem("token", token);
+  await AsyncStorage.setItem("token", res.data.token);
 
   return {token, user};
 };
@@ -75,7 +75,7 @@ export const getUserById = async (id: number) => {
 
 export const createCrisis = async (data: any) => {
   const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/RegistroCrisis`, data, {
+  const res = await axios.post(`${API_URL}/crisis`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
