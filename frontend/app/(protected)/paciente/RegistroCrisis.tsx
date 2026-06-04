@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { createCrisis } from "@services/api";
@@ -29,6 +29,13 @@ export default function RegistroCrisis() {
     loadToken();
   }, []);
 
+  const alertConfirm = () => {
+    Alert.alert("Estas seguro de que deseas guardar esta crisis?", "", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Aceptar", onPress: guardar },
+    ], { cancelable: true });
+  };
+
   const items = Array.from({ length: 60 }, (_, i) => ({
     label: `${i + 1} Minutos`,
     value: `${i + 1} Minutos`,
@@ -51,7 +58,7 @@ export default function RegistroCrisis() {
     console.log("Datos guardados:", datos);
   
 
-    alert("Paciente guardado correctamente");
+    alert("Crisis guardada");
   } catch (error) {
     console.error("Error guardando datos:", error);
     alert("Error guardando datos");
@@ -91,7 +98,7 @@ export default function RegistroCrisis() {
           <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
         </View>
 
-        <Button color='#6631D7' title="Registrar Crisis" onPress={guardar} />
+        <Button color='#6631D7' title="Registrar Crisis" onPress={alertConfirm} />
       </ScrollView>
     </ImageBackground>
   );

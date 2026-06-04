@@ -10,7 +10,7 @@ import fondo from '@assets/images/FondoApp.png';
 
 export default function EditarPaciente() {
 
-  const [patientId, setPatientId] = useState<number | null>(null);
+  const [patientId, setPatientId] = useState<number>(0);
 
   useEffect(() => {
   const loadToken = async () => {

@@ -80,3 +80,35 @@ export const createCrisis = async (data: any) => {
   });
   return res.data;
 };
+
+export const getCrisisById = async (id: number) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/crisis/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const createStudy = async (data: any) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.post(`${API_URL}/studies`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const getPatientStudies = async (patientId: number) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/studies/${patientId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const upsertStudy = async (data: any) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.post(`${API_URL}/studies/upsert`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
