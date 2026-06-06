@@ -1,16 +1,42 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React from "react";
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
 import { View, FlatList, ImageBackground, StyleSheet, Text } from "react-native";
+import { getUserByDoctorId } from "@services/api";
 
-// ✅ IMPORT DE IMAGEN (alias)
+//IMPORT DE IMAGEN (alias)
 import fondo from '@assets/images/FondoApp.png';
 
 export default function Pacientes() {
 
-  const items = [
-    { id: '1', name: 'Paciente 1', toto: 'hola', tata: 'adios', tete: 'saludos' },
-    { id: '2', name: 'Paciente 2' },
-  ];
+  const [userId, setUserId] = useState<number | null>(null);
+    const [patients, setPatients] = useState<any[]>([]);
+    
+      useEffect(() => {
+        const loadToken = async () => {
+           console.log("No corre el Token");
+          const token = await AsyncStorage.getItem("token"); // 👈 leer token
+          if (token) {
+            const decoded = jwtDecode<{ userId: number, role: string, doctorId: number }>(token); // 👈 decodificar
+            setUserId(decoded.userId);
+          }
+        };
+        loadToken();
+      }, []);
+
+      useEffect(() => {
+  if (userId) {
+    getUserByDoctorId(userId)
+      .then((data) => {
+        console.log("Pacientes recibidos:", data);
+        setPatients(data);
+      })
+      .catch((err) => {
+        console.error("Error cargando pacientes:", err.response?.data || err.message);
+      });
+  }
+}, [userId]);
 
   return (
     <ImageBackground
@@ -21,17 +47,18 @@ export default function Pacientes() {
       <View style={styles.pantalla}>
 
         <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
+          data={patients}
           contentContainerStyle={styles.contenedor}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.ListaPacientes}>
-              <Text>{item.name}</Text>
-              <Text>{item.toto}</Text>
-              <Text>{item.tata}</Text>
-              <Text>{item.tete}</Text>
+              <Text>{item.firstName} {item.lastName}</Text>
+              <Text>Email: {item.email}</Text>
+              <Text>Edad: {item.age}</Text>
+              <Text>Rol: {item.role}</Text>
             </View>
           )}
+          ListEmptyComponent={<Text style={{textAlign: "center"}}>No hay pacientes asignados</Text>}
         />
 
       </View>

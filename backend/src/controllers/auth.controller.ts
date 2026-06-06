@@ -19,8 +19,8 @@ export const register = async (req: Request, res: Response) => {
       data: { firstName, email, password: hashed, role: role || "Paciente" },
     });
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-    res.json({ user: { id: user.id, firstName: user.firstName, password: user.password, email: user.email, role: user.role}, token });
+    const token = jwt.sign({ userId: user.id, role: user.role, doctorId: user.doctorId }, JWT_SECRET, { expiresIn: "7d" });
+    res.json({ user: { id: user.id, doctorId: user.doctorId, firstName: user.firstName, password: user.password, email: user.email, role: user.role}, token });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: "Error en registro" });
@@ -39,7 +39,7 @@ export const login = async (req: Request, res: Response) => {
     if (!match) return res.status(400).json({ error: "Credenciales inválidas" });
 
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-    res.json({ user: { id: user.id, firstName: user.firstName, 
+    res.json({ user: { id: user.id, doctorId: user.doctorId, firstName: user.firstName,  
     lastName: user.lastName, email: user.email, role: user.role, firstTime: user.firstTime }, token });
   } catch (err: any) {
     console.error(err);
