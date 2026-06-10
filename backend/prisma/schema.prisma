@@ -64,7 +64,7 @@ model PatientMedication {
   name         String?
   dose         String?
   interval     String?
-  startDate    DateTime?
+  presentation String?
   patient      User    @relation(fields: [patientId], references: [id])
   medication   Medication @relation(fields: [medicationId], references: [id])
 }
