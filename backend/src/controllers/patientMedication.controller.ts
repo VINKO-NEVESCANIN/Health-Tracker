@@ -30,7 +30,10 @@ export const getPatientMedications = async (req: Request, res: Response) => {
     const patientId = Number(req.params.patientId);
     if (!patientId) return res.status(400).json({ error: "patientId requerido" });
 
-    const items = await prisma.patientMedication.findMany({ where: { patientId }, include: { medication: true }, orderBy: { presentation: "desc" } });    
+    const items = await prisma.patientMedication.findMany({
+          where: { patientId },
+          include: { medication: true }
+    });    
     res.json(items);
   } catch (err) {
     console.error(err);
