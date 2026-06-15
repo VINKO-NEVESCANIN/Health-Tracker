@@ -39,6 +39,7 @@ export default function AgregarMedicamento() {
     const [Frecuencia, setFrecuencia] = useState(""); // Tipos String?  lo matuve asi cambio abajo
     const nombreMedicamento = Medications.find(item => item.id === selectMeds)?.name;
     const [patientId, setPatientId] = useState<number | null>(null);
+    const abbreviation = Medications.find(item => item.id === selectMeds)?.abbreviation;
 
 
     const Presentaciones = [
@@ -84,6 +85,7 @@ export default function AgregarMedicamento() {
         interval: Frecuencia.toString(),
         name: nombreMedicamento,
         presentation: Presentacion,
+        abbreviation: abbreviation
       });
       router.push("/paciente/MisMedicamentos");
       console.log("Datos guardados:", datos);

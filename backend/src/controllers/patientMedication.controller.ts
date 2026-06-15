@@ -4,7 +4,7 @@ import prisma from "../config/db";
 
 export const createPatientMedication = async (req: Request, res: Response) => {
   try {
-    const { patientId, medicationId, dose, interval, name, presentation } = req.body;
+    const { patientId, medicationId, dose, interval, name, presentation, abbreviation } = req.body;
     if (!patientId || !medicationId) return res.status(400).json({ error: "patientId y medicationId requeridos" });
 
     const pm = await prisma.patientMedication.create({
@@ -15,6 +15,7 @@ export const createPatientMedication = async (req: Request, res: Response) => {
         dose: dose ?? null,
         interval: interval ?? null,
         presentation: presentation ?? null,
+        abbreviation: abbreviation ?? null,
       },
     });
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { createCrisis } from "@services/api";
+import { createCrisis, getPatientMedications  } from "@services/api";
 import { parseQueryParams } from "expo-router/build/fork/getStateFromPath-forks";
 import { useLocalSearchParams } from "expo-router";
 import { jwtDecode } from "jwt-decode";
@@ -17,6 +17,18 @@ export default function RegistroCrisis() {
   const [showFecha1, setShowFecha1] = useState(false);
   const [check, setCheck] = useState(false);
   const [patientId, setPatientId] = useState<number | null>(null);
+  const [listMedications, setListMedications] = useState<any[]>([]);
+  const medication = listMedications.map((pm) => pm.medication.abbreviation).join(", ");
+
+  useEffect(() => {
+    if(patientId) {
+      getPatientMedications(patientId)
+      .then(data => {
+          setListMedications(Array.isArray(data) ? data : data?.medications ?? []);
+        })
+        .catch(err => console.error("Error cargando medicamentos:", err));
+    }
+  }, [patientId]);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -54,6 +66,7 @@ export default function RegistroCrisis() {
       duration: duracion,
       recuperation: recuperacion,
       unconscius: check,
+      medication: medication,
     });
     console.log("Datos guardados:", datos);
   
