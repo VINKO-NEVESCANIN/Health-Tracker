@@ -4,11 +4,14 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { getPatientCrisis } from "@services/api";
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams } from "expo-router";
 
 export default function LineaDeCrisis() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [eventos, setEventos] = useState([]);
   const [patientId, setPatientId] = useState<number | null>(null);
+  const [showFechaSeleccionada, setShowFechaSeleccionada] = useState(false);
+  const {fecha1, fecha2} = useLocalSearchParams<{fecha1: string, fecha2: string}>();
 
   useEffect(() => {
     const loadToken = async () => {
@@ -42,12 +45,18 @@ export default function LineaDeCrisis() {
       <View style={{ flex: 1, padding: 20 }}>
         <Text style={styles.title}>Línea de Crisis</Text>
 
+    {showFechaSeleccionada && ( 
         <DateTimePicker
           value={fechaSeleccionada}
           mode="date"
           display="default"
-          onChange={(event, date) => date && setFechaSeleccionada(date)}
+          onChange={(eventos, date) => {
+            setShowFechaSeleccionada(false);
+            if (date) setFechaSeleccionada(date);
+            
+          }}
         />
+        )}
 
         <ScrollView horizontal contentContainerStyle={styles.timeline}>
           <View style={styles.lineBase} />
@@ -72,11 +81,13 @@ export default function LineaDeCrisis() {
 
               return (
                 <View key={index} style={styles.event}>
-                  <Text style={[styles.icon, { color }]}>{icon}</Text>
+                  <View style={styles.iconWrapper}>
+                    <Text style={[styles.icon, { color }]}>{icon}</Text>
+                  </View>
                   <Text style={styles.date}>
                     {new Date(ev.crisisDate).toLocaleDateString("es-MX", { timeZone: "UTC" })}
                   </Text>
-                  <Text style={{ fontSize: 12 }}>{ev.medication}</Text>
+                  <Text style={styles.med}>{ev.medication}</Text>
                 </View>
               );
             })}
@@ -93,23 +104,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  timeline: {
+   timeline: {
     flexDirection: "row",
-    marginBottom: 20,
+    alignItems: "center",
     position: "relative",
-    alignItems: "flex-start",
-    justifyContent: "center",
     height: 200,
   },
   lineBase: {
     position: "absolute",
-    top: "50%",
-    left: 57,
+    top: "80%",
+    left: 60,
     right: 0,
     height: 2,
     backgroundColor: "black",
   },
-  event: { alignItems: "center", marginHorizontal: 40, marginTop: "15%" },
-  icon: { fontSize: 28, marginTop: -14 },
-  date: { marginTop: 8, fontSize: 14 },
+  event: {
+    alignItems: "center",
+    marginHorizontal: 40,
+  },
+  iconWrapper: {
+    position: "absolute",
+    top: "77%",       // ícono siempre sobre la línea
+    transform: [{ translateY: -14 }], // ajusta para centrar el triángulo
+  },
+  icon: { fontSize: 28 },
+  date: { marginTop: 180, fontSize: 14 }, // fecha debajo
+  med: { fontSize: 12, color: "red", minHeight: 16 },  // medicamento debajo
 });
