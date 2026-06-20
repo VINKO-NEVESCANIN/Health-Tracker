@@ -81,3 +81,37 @@ export const getPatientCrisis = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error obteniendo crisis del paciente" });
   }
 };
+
+export const getDateCrisisByRange = async (req: Request, res: Response) => {
+  try {
+    const patientId = Number(req.params.patientId);
+    if (isNaN(patientId)) {
+      return res.status(400).json({ error: "patientId inválido" });
+    }
+
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Se requieren startDate y endDate" });
+    }
+
+    const inicio = new Date(startDate as string);
+    const fin = new Date(endDate as string);
+
+    const items = await prisma.crisis.findMany({
+      where: {
+        patientId,
+        crisisDate: {
+          gte: inicio,
+          lte: fin,
+        },
+      },
+      orderBy: { crisisDate: "asc" },
+    });
+
+    return res.json(items); // si no hay, devuelve []
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo crisis del paciente" });
+  }
+};

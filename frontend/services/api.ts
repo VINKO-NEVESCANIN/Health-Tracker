@@ -160,3 +160,12 @@ export const getPatientCrisis = async (patientId: number) => {
   });
   return res.data;
 };
+
+export const getDateCrisisByRange = async (patientId: number, startDate: Date, endDate: Date) => {
+  const token = await AsyncStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/crisis/range/${patientId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { startDate, endDate },
+  });
+  return res.data;
+};
