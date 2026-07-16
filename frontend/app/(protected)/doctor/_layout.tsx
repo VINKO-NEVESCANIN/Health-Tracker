@@ -41,7 +41,7 @@ export default function DoctorLayout() {
         }}
       />
       <Tabs.Screen
-        name="agregar-paciente"
+        name="AgregarPaciente"
         options={{
           title: "Agregar",
           tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,

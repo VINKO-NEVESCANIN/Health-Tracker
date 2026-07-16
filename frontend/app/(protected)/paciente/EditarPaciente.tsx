@@ -1,32 +1,20 @@
 import { useState,useEffect } from 'react';
-import { Picker } from "@react-native-picker/picker";
+import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {StyleSheet,Text, ImageBackground, ScrollView, View, TextInput, Button, Switch} from 'react-native';
-import { jwtDecode } from "jwt-decode";
-import { getUserById, updateInfo } from '@services/api';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import fondo from '@assets/images/FondoApp.png';
+import { getUserById, updateInfo } from 'services/api';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function EditarPaciente() {
 
-  const [patientId, setPatientId] = useState<number>(0);
+  const params = useLocalSearchParams();
+  const id = params.id ? Number(params.id) : null;
+  const idedit = id;
 
   useEffect(() => {
-  const loadToken = async () => {
-      const token = await AsyncStorage.getItem("token"); // 👈 leer token
-      if (token) {
-        const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
-        setPatientId(decoded.userId);
-      }
-    };
-    loadToken();
-  }, []);
-
-  useEffect(() => {
-  if (patientId) {
-    getUserById(patientId)
-      .then((p: any) => {
+  if (id) {
+    getUserById(id)
+      .then(p => {
         // 👇 llena tus estados con los datos del backend
         setInputs([p.firstName, p.lastName, String(p.height), String(p.weight)]);
         setFecha1(new Date(p.birthdate));
@@ -42,11 +30,11 @@ export default function EditarPaciente() {
           respiDisorder: p.respiDisorder,
       });
       })
-      .catch((err: Error) =>
-  console.error("Error cargando paciente:", err.message)
-);
+      .catch(err => 
+        console.error("Error cargando paciente:", err)
+      );
   }
-}, [patientId]);
+}, [id]);
 
   const labels = ['Nombre', 'Primer Apellido', 'Altura', 'Peso'];
 
@@ -80,7 +68,7 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
 
 
   const guardar = async () => {
-    if (!patientId) {
+    if (!idedit) {
         alert("ID inválido");
         return;
       }
@@ -101,7 +89,7 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
       respiDisorder: checks.respiDisorder
     };
     try {
-    const paciente = await updateInfo(patientId, datos);
+    const paciente = await updateInfo(idedit, datos);
     console.log("Paciente guardado:", paciente);
     alert("Paciente guardado correctamente");
   } catch (err: any) {
@@ -111,7 +99,7 @@ const [checks, setChecks] = useState<{ [k: string]: boolean }>(
   }
     return (
       <ImageBackground
-         source={fondo} // Ruta adsoluta de la imagen
+         source={require('../../../assets/images/FondoApp.png')} // Ruta de tu imagen
             style={styles.fondo}
             resizeMode="cover"
           >

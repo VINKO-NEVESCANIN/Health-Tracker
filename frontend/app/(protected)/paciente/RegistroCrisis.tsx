@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
-import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View, Alert } from "react-native";
+import { useState } from "react";
+import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { createCrisis, getPatientMedications  } from "@services/api";
-import { parseQueryParams } from "expo-router/build/fork/getStateFromPath-forks";
-import { useLocalSearchParams } from "expo-router";
-import { jwtDecode } from "jwt-decode";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import fondo from "@assets/images/FondoApp.png";
-
+import { createCrisis } from "@/services/api";
 
 export default function RegistroCrisis() {
   const [duracion, setDuracion] = useState("1 Minutos");
@@ -16,37 +10,6 @@ export default function RegistroCrisis() {
   const [fecha1, setFecha1] = useState(new Date());
   const [showFecha1, setShowFecha1] = useState(false);
   const [check, setCheck] = useState(false);
-  const [patientId, setPatientId] = useState<number | null>(null);
-  const [listMedications, setListMedications] = useState<any[]>([]);
-  const medication = listMedications.map((pm) => pm.medication.abbreviation).join(", ");
-
-  useEffect(() => {
-    if(patientId) {
-      getPatientMedications(patientId)
-      .then(data => {
-          setListMedications(Array.isArray(data) ? data : data?.medications ?? []);
-        })
-        .catch(err => console.error("Error cargando medicamentos:", err));
-    }
-  }, [patientId]);
-
-  useEffect(() => {
-    const loadToken = async () => {
-      const token = await AsyncStorage.getItem("token"); // 👈 leer token
-      if (token) {
-        const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
-        setPatientId(decoded.userId);
-      }
-    };
-    loadToken();
-  }, []);
-
-  const alertConfirm = () => {
-    Alert.alert("Estas seguro de que deseas guardar esta crisis?", "", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Aceptar", onPress: guardar },
-    ], { cancelable: true });
-  };
 
   const items = Array.from({ length: 60 }, (_, i) => ({
     label: `${i + 1} Minutos`,
@@ -58,28 +21,25 @@ export default function RegistroCrisis() {
     value: `${i + 1} Minutos`,
   }));
 
-  const guardar = async () => {
-    try{
-    const datos = await createCrisis({
-      patientId: patientId,
-      date: fecha1,
-      duration: duracion,
-      recuperation: recuperacion,
-      unconscius: check,
-      medication: medication,
-    });
+  const guardar = () => {
+    const datos = {
+      fecha1,
+      duracion,
+      recuperacion,
+      check,
+    };
+    createCrisis(datos)
+      .then((res) => {
+        console.log("Crisis registrada:", res);
+      })
+      .catch((err) => {
+        console.error("Error registrando crisis:", err);
+      });
     console.log("Datos guardados:", datos);
-  
-
-    alert("Crisis guardada");
-  } catch (error) {
-    console.error("Error guardando datos:", error);
-    alert("Error guardando datos");
-  }
- };
+  };
 
   return (
-    <ImageBackground source={fondo} style={styles.fondo} resizeMode="cover">
+    <ImageBackground source={require("../../../assets/images/FondoApp.png")} style={styles.fondo} resizeMode="cover">
       <ScrollView contentContainerStyle={styles.contenedor}>
         <Text style={styles.title}>Fecha de la crisis:</Text>
         <Button color='#6631D7' title={fecha1.toLocaleDateString()} onPress={() => setShowFecha1(true)} />
@@ -111,7 +71,7 @@ export default function RegistroCrisis() {
           <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
         </View>
 
-        <Button color='#6631D7' title="Registrar Crisis" onPress={alertConfirm} />
+        <Button color='#6631D7' title="Guardar" onPress={guardar} />
       </ScrollView>
     </ImageBackground>
   );

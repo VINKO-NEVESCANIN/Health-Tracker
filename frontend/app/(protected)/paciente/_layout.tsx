@@ -41,7 +41,7 @@ export default function PacienteLayout() {
         }}
       />
       <Tabs.Screen
-        name="historial-crisis"
+        name="HistorialCrisis"
         options={{
           title: "Historial",
           tabBarIcon: ({ color }) => (

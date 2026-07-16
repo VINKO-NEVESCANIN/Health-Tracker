@@ -1,61 +1,55 @@
-import { router, useRouter } from "expo-router";
 import { useState } from "react";
 import { Button, ImageBackground, StyleSheet, Text, View } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import fondo from '@assets/images/FondoApp.png';
 
 export default function VerEpileptograma() {
-    const [startDate, setStartDate] = useState(new Date());
-    const [showStartDate, setShowStartDate] = useState(false);
-    const [endDate, setEndDate] = useState(new Date());
-    const [showEndDate, setShowEndDate] = useState(false);
-
-  const formatFecha = (date: Date) => {
-  const tzOffset = date.getTimezoneOffset() * 60000;
-  const localISO = new Date(date.getTime() - tzOffset).toISOString().split("T")[0];
-  return localISO;
-};
-
-    const handleBuscar = () => {
-        // Lógica para buscar el epileptograma entre las dos fechas
- console.log("Buscar entre:", startDate, "y", endDate);
-        router.push(`../paciente/Epileptograma?startDate=${formatFecha(startDate)}&endDate=${formatFecha(endDate)}`);
-       };
+  const [fecha1, setFecha1] = useState(new Date());
+  const [showFecha1, setShowFecha1] = useState(false);
+  const [fecha2, setFecha2] = useState(new Date());
+  const [showFecha2, setShowFecha2] = useState(false);
 
   return (
     <ImageBackground source={fondo} style={{ flex: 1 }}>
       <View style={styles.contenedor}>
         <Text style={styles.title}>Seleccione la Fecha Inicial:</Text>
 
-<Button color='#6631D7' title={startDate.toLocaleDateString("es-MX")} onPress={() => setShowStartDate(true)} />
+        <Button
+          color='#6631D7'
+          title={fecha1.toLocaleDateString()}
+          onPress={() => setShowFecha1(true)}
+        />
+
         <DateTimePickerModal
-           isVisible={showStartDate}
+          isVisible={showFecha1}
           mode="date"
           onConfirm={(date) => {
-            const ajustada = new Date(date); 
-            ajustada.setHours(0,0,0,0);
-            setStartDate(ajustada);
-            setShowStartDate(false);
+            setFecha1(date);
+            setShowFecha1(false);
           }}
-          onCancel={() => setShowStartDate(false)}
+          onCancel={() => setShowFecha1(false)}
         />
 
         <Text style={styles.title}>Seleccione la Fecha Final:</Text>
-        <Button color='#6631D7' title={endDate.toLocaleDateString("es-MX")} onPress={() => setShowEndDate(true)} />
+
+        <Button
+          color='#6631D7'
+          title={fecha2.toLocaleDateString()}
+          onPress={() => setShowFecha2(true)}
+        />
+
         <DateTimePickerModal
-          isVisible={showEndDate}
+          isVisible={showFecha2}
           mode="date"
           onConfirm={(date) => {
-            const ajustada = new Date(date);
-            ajustada.setHours(0,0,0,0);
-            setEndDate(ajustada);
-            setShowEndDate(false);
+            setFecha2(date);
+            setShowFecha2(false);
           }}
-          onCancel={() => setShowEndDate(false)}
+          onCancel={() => setShowFecha2(false)}
         />
 
         <View style={styles.EspacioArriba}>
-          <Button color='#6631D7' title="Buscar" onPress={handleBuscar} />
+          <Button color='#6631D7' title="Buscar" onPress={() => {}} />
         </View>
 
       </View>

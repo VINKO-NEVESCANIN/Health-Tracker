@@ -1,96 +1,49 @@
-import {useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Alert, Button } from "react-native";
-import { ImageBackground, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import {deletePatientMedication, getPatientMedications} from "@services/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Button, ImageBackground, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 
 // ✅ IMPORT
 import fondo from '@assets/images/FondoApp.png';
 
 export default function MisMedicamentos() {
 
-  const [PatientId, setPatientId] = useState<number | null>(null);
-  const [listMedications, setListMedications] = useState<any[]>([]);
-
-  useFocusEffect(
-  React.useCallback(() => {
-    if (PatientId) {
-      getPatientMedications(PatientId)
-        .then(data => {
-          setListMedications(Array.isArray(data) ? data : data?.medications ?? []);
-        })
-        .catch(err => console.error("Error cargando medicamentos:", err));
-    }
-  }, [PatientId])
-);
-
-  useEffect(() => {
-    const loadToken = async () => {
-      const token = await AsyncStorage.getItem("token"); // 👈 leer token
-        if (token) {
-          const decoded = jwtDecode<{ userId: number }>(token); // 👈 decodificar
-          setPatientId(decoded.userId);
-        }
-      };
-      loadToken();
-    }, []);
-
-    const alertConfirmDelete = (id: number) => {
-      Alert.alert(
-        "Confirmar eliminación",
-        "¿Estás seguro de que deseas eliminar este medicamento?",
-        [
-          {
-            text: "Cancelar",
-            style: "cancel",
-          },
-          {
-            text: "Eliminar",
-            onPress: async () => {
-              try {
-                await deletePatientMedication(id);
-                setListMedications((listMedications) =>
-                  listMedications.filter((m) => m.id !== id)
-                );
-              } catch (error) {
-                console.error("Error eliminando medicamento:", error);
-              }
-            },
-          },
-        ]
-      );
-    };
+  const [cards, setCards] = useState([
+    { id: 1, title: "Tarjeta 1", content: "Contenido de la tarjeta 1" },
+    { id: 2, title: "Tarjeta 2", content: "Contenido de la tarjeta 2" },
+    { id: 3, title: "Tarjeta 3", content: "Contenido de la tarjeta 3" },
+  ]);
 
   const router = useRouter();
+
+  const eliminarCard = (id: number) => {
+    setCards(cards.filter((card) => card.id !== id));
+  };
 
   return (
     <ImageBackground source={fondo} style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
-        {listMedications.map((med) => (
-    <View key={med.id} style={styles.card}>
-      <Text style={styles.title}>{med.medication?.name || "Sin nombre"}</Text>
-      <Text>Presentación: {med.presentation || "Ninguna"}</Text>
-      <Text>Dosis: {med.dose || "Ninguna"} </Text>
-      <Text>Frecuencia: {med.interval ? `${med.interval} horas` : "Ninguna"}</Text>
+        {cards.map((card) => (
+          <View key={card.id} style={styles.card}>
+            <Text style={styles.title}>{card.title}</Text>
+            <Text>{card.content}</Text>
 
-      <TouchableOpacity
-        style={styles.deleteBtn}
-        onPress={() => alertConfirmDelete(med.id)}
-      >
-        <Text style={styles.deleteText}>X</Text>
-      </TouchableOpacity>
-    </View>
-  ))}
+            <TouchableOpacity
+              style={styles.deleteBtn}
+              onPress={() => eliminarCard(card.id)}
+            >
+              <Text style={styles.deleteText}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
 
-  <Button
-    color="#6631D7"
-    title="Agregar Medicamento"
-    onPress={() => router.push("../paciente/AgregarMedicamento")}
-  />
-</ScrollView>
+        <Button
+          color="#6631D7"
+          title="Agregar Medicamento"
+          onPress={() => {
+            router.push('/paciente/AgregarMedicamento');
+          }}
+        />
+      </ScrollView>
     </ImageBackground>
   );
 }
