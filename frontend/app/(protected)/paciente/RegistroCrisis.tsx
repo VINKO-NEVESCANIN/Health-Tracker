@@ -1,15 +1,25 @@
 import { useState } from "react";
-import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { createCrisis } from "@services/api";
+import { useAuth } from "@context/auth";
 
 export default function RegistroCrisis() {
+  const { patientId: patientIdParam } = useLocalSearchParams<{ patientId?: string }>();
+  const { user } = useAuth();
+  const router = useRouter();
+  // Si un doctor navegó aquí desde el perfil de un paciente, usamos ese id;
+  // si no, es el propio paciente registrando su crisis.
+  const patientId = patientIdParam ? Number(patientIdParam) : user?.id;
+
   const [duracion, setDuracion] = useState("1 Minutos");
   const [recuperacion, setRecuperacion] = useState("1 Minutos");
   const [fecha1, setFecha1] = useState(new Date());
   const [showFecha1, setShowFecha1] = useState(false);
   const [check, setCheck] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const items = Array.from({ length: 60 }, (_, i) => ({
     label: `${i + 1} Minutos`,
@@ -22,20 +32,27 @@ export default function RegistroCrisis() {
   }));
 
   const guardar = () => {
-    const datos = {
-      fecha1,
-      duracion,
-      recuperacion,
-      check,
-    };
-    createCrisis(datos)
-      .then((res) => {
-        console.log("Crisis registrada:", res);
+    if (!patientId) {
+      Alert.alert("Error", "No se pudo identificar al paciente.");
+      return;
+    }
+    setSaving(true);
+    createCrisis({
+      patientId,
+      date: fecha1.toISOString(),
+      duration: parseInt(duracion, 10),
+      recuperation: parseInt(recuperacion, 10),
+      unconscius: check,
+    })
+      .then(() => {
+        Alert.alert("Listo", "Crisis registrada correctamente.");
+        router.back();
       })
       .catch((err) => {
         console.error("Error registrando crisis:", err);
-      });
-    console.log("Datos guardados:", datos);
+        Alert.alert("Error", "No se pudo registrar la crisis.");
+      })
+      .finally(() => setSaving(false));
   };
 
   return (
@@ -71,7 +88,7 @@ export default function RegistroCrisis() {
           <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
         </View>
 
-        <Button color='#6631D7' title="Guardar" onPress={guardar} />
+        <Button color='#6631D7' title={saving ? "Guardando..." : "Guardar"} onPress={guardar} disabled={saving} />
       </ScrollView>
     </ImageBackground>
   );

@@ -11,6 +11,7 @@ module.exports = function(api) {
             '@': './',
             '@assets': './assets',
             '@components': './components',
+            '@constants': './constants',
             '@context': './context',
             '@services': './services'
           }

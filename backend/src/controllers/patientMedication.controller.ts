@@ -4,18 +4,17 @@ import prisma from "../config/db";
 
 export const createPatientMedication = async (req: Request, res: Response) => {
   try {
-    const { patientId, medicationId, dose, interval, name, presentation, abbreviation } = req.body;
+    const { patientId, medicationId, dose, interval, name, startDate } = req.body;
     if (!patientId || !medicationId) return res.status(400).json({ error: "patientId y medicationId requeridos" });
 
     const pm = await prisma.patientMedication.create({
       data: {
         patientId: Number(patientId),
         medicationId: Number(medicationId),
-        name: name ?? null,
+        name,
         dose: dose ?? null,
         interval: interval ?? null,
-        presentation: presentation ?? null,
-        abbreviation: abbreviation ?? null,
+        startDate: startDate ? new Date(startDate) : undefined,
       },
     });
 
@@ -31,10 +30,7 @@ export const getPatientMedications = async (req: Request, res: Response) => {
     const patientId = Number(req.params.patientId);
     if (!patientId) return res.status(400).json({ error: "patientId requerido" });
 
-    const items = await prisma.patientMedication.findMany({
-          where: { patientId },
-          include: { medication: true }
-    });    
+    const items = await prisma.patientMedication.findMany({ where: { patientId }, include: { medication: true }, orderBy: { startDate: "desc" } });
     res.json(items);
   } catch (err) {
     console.error(err);

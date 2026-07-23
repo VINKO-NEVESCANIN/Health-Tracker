@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Usar la IP de tu máquina en la red local, no "localhost" (Expo Go corre en el celular)
+// ⚠️ Usa la IP de tu máquina en la red local, no "localhost" (Expo Go corre en el celular)
 // TODO: mover a variable de entorno (app.config.ts / EAS) antes de compilar para producción.
 export const API_URL = "http://192.168.50.171:4000";
 
@@ -63,13 +63,24 @@ export const logout = async () => {
 };
 
 // ---------- Usuarios (pacientes/doctores viven en el mismo modelo User) ----------
-export const getUsers = async () => {
-  const res = await api.get("/users");
+export const getUsers = async (opts?: { search?: string; role?: string }) => {
+  const res = await api.get("/users", { params: opts });
   return res.data.users ?? res.data;
 };
 
 export const getUserById = async (id: number) => {
   const res = await api.get(`/users/${id}`);
+  return res.data;
+};
+
+export const createPatient = async (data: {
+  firstName: string;
+  lastName?: string;
+  email: string;
+  password: string;
+  doctorId?: number;
+}) => {
+  const res = await api.post("/users", { ...data, role: "Paciente" });
   return res.data;
 };
 
@@ -97,6 +108,11 @@ export const updateAccess = async (id: number, data: any) => {
 // Antes apuntaba a "/RegistroCrisis", que no existe en el backend (server.ts expone "/crisis")
 export const createCrisis = async (data: any) => {
   const res = await api.post("/crisis", data);
+  return res.data;
+};
+
+export const getPatientCrisis = async (patientId: number) => {
+  const res = await api.get(`/crisis/${patientId}`);
   return res.data;
 };
 

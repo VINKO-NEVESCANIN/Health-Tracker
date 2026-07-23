@@ -3,7 +3,6 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -64,8 +63,7 @@ model PatientMedication {
   name         String?
   dose         String?
   interval     String?
-  presentation String?
-  abbreviation String?
+  startDate    DateTime?
   patient      User    @relation(fields: [patientId], references: [id])
   medication   Medication @relation(fields: [medicationId], references: [id])
 }
@@ -73,12 +71,12 @@ model PatientMedication {
 model Study {
   id        Int      @id @default(autoincrement())
   patientId Int
-  dateEEG   DateTime?  @default(now())
-  dateRMNC  DateTime?  @default(now())
-  dateNSMAP DateTime?  @default(now())
-  resEEG    String?    @default("No Realizado")
-  resRMNC   String?    @default("No Realizado")
-  resNSMAP  String?    @default("No Realizado")
+  dateEEG   DateTime?
+  dateRMNC  DateTime?
+  dateNSMAP DateTime?	
+  resEEG    String?
+  resRMNC   String?
+  resNSMAP  String?
   patient   User  @relation(fields: [patientId], references: [id])
 }
 
@@ -90,6 +88,5 @@ model Crisis {
   duration    Int?
   recuperation   Int? 
   unconscius  Boolean?
-  medication  String?
   patient     User  @relation(fields: [patientId], references: [id])
 }

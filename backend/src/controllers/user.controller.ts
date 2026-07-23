@@ -3,7 +3,7 @@ import prisma from "../config/db";
 import bcrypt from "bcrypt";
 
 export const createUser = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, role } = req.body;
+  const { firstName, lastName, email, password, role, doctorId } = req.body;
 
   if (!password) return res.status(400).json({ error: "password requerido" });
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -14,6 +14,7 @@ export const createUser = async (req: Request, res: Response) => {
      email,
      password: hashedPassword,
      role: role || "user",
+     doctorId: doctorId ? Number(doctorId) : undefined,
      } });
   res.json(user);
 };
@@ -22,9 +23,11 @@ export const getUsers = async (req: any, res: Response) => {
   try {
     const doctorId = req.userId;
     const search = (req.query.search as string) || "";
+    const role = req.query.role as string | undefined;
 
-    const users = await prisma.user.findMany({  
+    const users = await prisma.user.findMany({
       where: {
+        ...(role ? { role } : {}),
         OR: [
           { firstName: { contains: search, mode: "insensitive" } },
           { lastName: { contains: search, mode: "insensitive" } },
@@ -58,26 +61,6 @@ try{
   res.status(500).json({ error: "Error obteniendo usuario" });
 }
 };
-
-export const getUserByDoctorId = async (req: Request, res: Response) => {
-  try {
-    const doctorId = Number(req.params.doctorId);
-    const user = await prisma.user.findMany({
-      where: { doctorId },
-      include: {
-        appointments: true,
-        crisis: true,
-        medications: { include: { medication: true } },
-        studies: true
-      }
-    });
-    res.json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error obteniendo usuario" });
-  }
-};
-
 
 export const updateAccess = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role } = req.body;

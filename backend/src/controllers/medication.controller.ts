@@ -38,7 +38,7 @@ export const getMedication = async (req: Request, res: Response) => {
     res.json(med);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error obteniendo medicamento" }); // Si es correcto, corregir "medicameto" a "medicamento"
+    res.status(500).json({ error: "Error obteniendo medicamento" });
   }
 };
 
