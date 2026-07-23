@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { createCrisis } from "@/services/api";
+import { createCrisis } from "@services/api";
 
 export default function RegistroCrisis() {
   const [duracion, setDuracion] = useState("1 Minutos");

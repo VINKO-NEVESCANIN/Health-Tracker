@@ -1,171 +1,103 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ⚠️ Usa la IP de tu máquina en la red local, no "localhost"
-const API_URL = "http://192.168.100.35:4000"; 
+// Usar la IP de tu máquina en la red local, no "localhost" (Expo Go corre en el celular)
+// TODO: mover a variable de entorno (app.config.ts / EAS) antes de compilar para producción.
+export const API_URL = "http://192.168.50.171:4000";
 
-// Servicio de login
+const api = axios.create({ baseURL: API_URL });
+
+// Adjunta el token guardado a cada request automáticamente
+api.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem("token");
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Tipos básicos devueltos por el backend (auth.controller.ts)
+export type Role = "Paciente" | "Doctor" | string;
+
+export interface AuthUser {
+  id: number;
+  firstName: string | null;
+  lastName?: string | null;
+  email: string;
+  role: Role;
+  firstTime?: boolean;
+}
+
+// ---------- Auth ----------
 export const login = async (email: string, password: string) => {
-  const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-  const {token, user} = res.data;
-
-  // Guardar token en AsyncStorage
-  await AsyncStorage.setItem("token", res.data.token);
-
-  return {token, user};
+  const res = await api.post("/auth/login", { email, password });
+  const { token, user } = res.data as { token: string; user: AuthUser };
+  await AsyncStorage.setItem("token", token);
+  return { token, user };
 };
 
-// Servicio para crear Usuarios
-export const createUser = async (firstName: string, email: string, password: string, role: string) => {
+export const register = async (
+  firstName: string,
+  email: string,
+  password: string,
+  role: string
+) => {
+  const res = await api.post("/auth/register", { firstName, email, password, role });
+  const { token, user } = res.data as { token: string; user: AuthUser };
+  // El backend ya regresa token en el registro, así que dejamos al usuario logueado
+  if (token) await AsyncStorage.setItem("token", token);
+  return { token, user };
+};
+
+// Restaura la sesión a partir del token guardado (usado al abrir la app)
+export const getMe = async (): Promise<AuthUser | null> => {
   const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/auth/register`, {firstName, email, password, role }, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  if (!token) return null;
+  const res = await api.get("/auth/me");
+  return res.data.user as AuthUser;
+};
+
+export const logout = async () => {
+  await AsyncStorage.removeItem("token");
+};
+
+// ---------- Usuarios (pacientes/doctores viven en el mismo modelo User) ----------
+export const getUsers = async () => {
+  const res = await api.get("/users");
+  return res.data.users ?? res.data;
+};
+
+export const getUserById = async (id: number) => {
+  const res = await api.get(`/users/${id}`);
   return res.data;
 };
 
-// Servicio para obtener usuarios
-export const getUsers = async () => {
-  try {
-    const token = await AsyncStorage.getItem("token");
-    if (!token) throw new Error("No hay token guardado en AsyncStorage");
-
-    const res = await axios.get(`${API_URL}/users`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    console.log("Respuesta backend pacientes:", res.data);
-
-    // Si el backend devuelve { users: [...] }
-    if (res.data.users) {
-      return res.data.users;
-    }
-
-    // Si devuelve directamente un arreglo [...]
-    return res.data;
-  } catch (err: any) {
-    console.error("Error en getPatients:", err.response?.data || err.message);
-    throw err;
-  }
+export const createUser = async (
+  firstName: string,
+  email: string,
+  password: string,
+  role: string
+) => {
+  const res = await api.post("/users", { firstName, email, password, role });
+  return res.data;
 };
 
 export const updateInfo = async (id: number, data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.put(`${API_URL}/patients/${id}`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await api.put(`/users/${id}`, data);
   return res.data;
 };
 
 export const updateAccess = async (id: number, data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.put(`${API_URL}/patients/${id}/access`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await api.put(`/users/${id}/access`, data);
   return res.data;
 };
 
-export const getUserById = async (id: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/users/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
+// ---------- Crisis ----------
+// Antes apuntaba a "/RegistroCrisis", que no existe en el backend (server.ts expone "/crisis")
 export const createCrisis = async (data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/crisis`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await api.post("/crisis", data);
   return res.data;
 };
 
-export const getCrisisById = async (id: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/crisis/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const createStudy = async (data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/studies`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getPatientStudies = async (patientId: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/studies/${patientId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const upsertStudy = async (data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/studies/upsert`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getUserByDoctorId = async (doctorId: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/users/doctor/${doctorId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getMedications = async () => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/medications`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const createPatientMedication = async (data: any) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.post(`${API_URL}/patient-medications`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getPatientMedications = async (patientId: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/patient-medications/${patientId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const deletePatientMedication = async (id: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.delete(`${API_URL}/patient-medications/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getPatientCrisis = async (patientId: number) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/crisis/patients/${patientId}/crisis`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
-
-export const getDateCrisisByRange = async (patientId: number, startDate: Date, endDate: Date) => {
-  const token = await AsyncStorage.getItem("token");
-  const res = await axios.get(`${API_URL}/crisis/range/${patientId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { startDate, endDate },
-  });
-  return res.data;
-};
+export default api;
