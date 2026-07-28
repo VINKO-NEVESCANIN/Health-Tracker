@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
-import { ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { ImageBackground, StyleSheet, Text, Image, Pressable, FlatList } from 'react-native';
 
 // ✅ IMPORTS
 import fondo from '@assets/images/FondoApp.png';
@@ -24,130 +23,56 @@ export default function MisCitas() {
       style={styles.fondo}
       resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={styles.contenedor}>
-
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.contenedor}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.card}
-              onPress={() => router.push({
-                pathname: '/paciente/EditarCita', // ✅ absoluta
-                params: {
-                  condition: '2',
-                  id: item.id
-                }
-              })}
-            >
-              <Image source={item.Image} style={styles.foto} />
-              <Text>{item.name}</Text>
-              <Text>{item.Fecha}</Text>
-              <Text>{item.Hora}</Text>
-              <Text>{item.Resumen}</Text>
-            </Pressable>
-          )}
-        />
-
-        <View style={styles.contenedor}></View>
-
-      </ScrollView>
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.contenedor}
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.card}
+            onPress={() => router.push({
+              pathname: '/(protected)/paciente/EditarCita',
+              params: {
+                condition: '1',
+                id: item.id
+              }
+            })}
+          >
+            <Image source={item.Image} style={styles.foto} />
+            <Text>{item.name}</Text>
+            <Text>{item.Fecha}</Text>
+            <Text>{item.Hora}</Text>
+            <Text>{item.Resumen}</Text>
+          </Pressable>
+        )}
+      />
     </ImageBackground>
   );
 }
 
-   const styles = StyleSheet.create({
-
-  fondo:{
-    flex: 1,
-  },
-
-  ListaPacientes:{
-    backgroundColor: "#C9B1FF",
-    width: 120,
-    height: 120,
-    boxShadow: "16px 8px 16px rgba(0, 0, 0, 0.25)",
-    borderRadius: 20,
-    borderWidth: 2,
-
-  },
-   pantalla: {
-    flex: 1,
-    paddingTop: 40,
-  },
+const styles = StyleSheet.create({
+  fondo: { flex: 1 },
   contenedor: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-  },
-  fila: {
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  input: {
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: "#000000ff",
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: '#ffffff',
-    alignSelf: 'center',
-    width: '95%',
-  },
-textarea: {
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 5,
-    padding: 12,
-    textAlignVertical: 'top', // asegura que el texto empiece arriba
-    backgroundColor: '#fff',
-    width: '100%',
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  subtitulo: {
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  input2: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
-    color: '#000',
-    marginBottom: 12,
-    elevation: 2,
-  },
-  label: {
-    fontSize: 16,
-    paddingLeft: 10,
-    marginBottom: 4,
+    paddingTop: 16,
   },
   card: {
     alignItems: 'flex-start',
     backgroundColor: '#CEB5FF',
     padding: 16,
     borderRadius: 12,
-    elevation: 4, // sombra en Android
-    shadowColor: '#000', // sombra en iOS
+    elevation: 4,
+    shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 4,
     borderWidth: 2,
     marginTop: 10,
-    
   },
   foto: {
     width: 60,
     height: 60,
-    borderRadius: 60, // círculo
+    borderRadius: 60,
     marginBottom: 12,
   },
-
 });

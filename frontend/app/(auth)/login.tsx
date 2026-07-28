@@ -49,9 +49,9 @@ export default function LoginScreen() {
           pathname: "/(protected)/paciente/EditarPaciente",
           params: { id: String(loggedUser.id) },
         });
+      } else {
+        router.replace("/(protected)/home");
       }
-      // En cualquier otro caso, app/index.tsx redirige a /(protected)/home
-      // automáticamente en cuanto el AuthProvider actualiza el usuario.
     } catch (err: any) {
       const msg =
         err?.response?.data?.error ?? "No se pudo iniciar sesión. Verifica tus datos.";

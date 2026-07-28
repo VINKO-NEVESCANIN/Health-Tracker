@@ -50,7 +50,7 @@ export default function PerfilPaciente() {
   const ultimaCrisis = patient.crisis?.[0];
 
   const quickActions = [
-    { icon: "analytics" as const, label: "Timeline", color: theme.purple500, onPress: () => router.push({ pathname: "/(protected)/doctor/EpileptoGrama" }) },
+    { icon: "analytics" as const, label: "Timeline", color: theme.purple500, onPress: () => router.push({ pathname: "/(protected)/doctor/EpileptoGrama", params: { patientId: String(patient.id) } }) },
     {
       icon: "heart" as const,
       label: "Crisis",
@@ -58,7 +58,7 @@ export default function PerfilPaciente() {
       onPress: () =>
         router.push({ pathname: "/(protected)/paciente/RegistroCrisis", params: { patientId: String(patient.id) } }),
     },
-    { icon: "medical" as const, label: "Medicamentos", color: theme.indigo500, onPress: () => router.push("/(protected)/doctor/medicamentos") },
+    { icon: "medical" as const, label: "Medicamentos", color: theme.indigo500, onPress: () => router.push({ pathname: "/(protected)/doctor/medicamentos", params: { patientId: String(patient.id) } }) },
     { icon: "calendar" as const, label: "Citas", color: theme.blue500, onPress: () => router.push("/(protected)/doctor/GestionarCitas") },
   ];
 

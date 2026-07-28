@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
-import { ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { ImageBackground, StyleSheet, Text, View, Image, Pressable, FlatList } from 'react-native';
 
 // ✅ IMPORTS DE IMÁGENES
 import fondo from '@assets/images/FondoApp.png';
@@ -20,42 +19,36 @@ export default function GestionarCitas() {
 
   return (
     <ImageBackground
-      source={fondo} // ✅ ya no relativa
+      source={fondo}
       style={styles.fondo}
       resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={styles.contenedor}>
-
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.contenedor}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.card}
-              onPress={() => router.push({
-                pathname: '/paciente/EditarCita', // ⚠️ mejor usar ruta absoluta
-                params: {
-                  condition: '2',
-                  id: item.id
-                }
-              })}
-            >
-              <Image
-                source={item.Image}
-                style={styles.foto}
-              />
-              <Text>{item.name}</Text>
-              <Text>{item.Tepilepsy}</Text>
-              <Text>{item.Edad}</Text>
-              <Text>{item.Tel}</Text>
-            </Pressable>
-          )}
-        />
-
-        <View style={styles.contenedor}></View>
-
-      </ScrollView>
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.contenedor}
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.card}
+            onPress={() => router.push({
+              pathname: '/(protected)/paciente/EditarCita',
+              params: {
+                condition: '2',
+                id: item.id
+              }
+            })}
+          >
+            <Image
+              source={item.Image}
+              style={styles.foto}
+            />
+            <Text>{item.name}</Text>
+            <Text>{item.Tepilepsy}</Text>
+            <Text>{item.Edad}</Text>
+            <Text>{item.Tel}</Text>
+          </Pressable>
+        )}
+      />
     </ImageBackground>
   );
 }
@@ -66,6 +59,7 @@ const styles = StyleSheet.create({
   contenedor: {
     paddingHorizontal: 16,
     paddingBottom: 20,
+    paddingTop: 16,
   },
   card: {
     backgroundColor: '#CEB5FF',
