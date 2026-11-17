@@ -10,8 +10,9 @@ export const createMedication = async (req: Request, res: Response) => {
     const med = await prisma.medication.create({
       data: {
         name,
-        type,
-        abbreviation,
+        // type y abbreviation son obligatorios en la base de datos
+        type: type ?? "General",
+        abbreviation: abbreviation ?? String(name).slice(0, 3).toUpperCase(),
       }
     });
     res.status(201).json(med);
