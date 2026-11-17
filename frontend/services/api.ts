@@ -116,4 +116,37 @@ export const getPatientCrisis = async (patientId: number) => {
   return res.data;
 };
 
+// ---------- Medicamentos ----------
+export const getMedicationsCatalog = async () => {
+  const res = await api.get("/medications");
+  return res.data;
+};
+
+export const createMedicationCatalog = async (data: { name: string; type?: string; abbreviation?: string }) => {
+  const res = await api.post("/medications", data);
+  return res.data;
+};
+
+export const getPatientMedications = async (patientId: number) => {
+  const res = await api.get(`/patient-medications/${patientId}`);
+  return res.data;
+};
+
+export const assignMedication = async (data: {
+  patientId: number;
+  medicationId: number;
+  name?: string;
+  dose?: string;
+  interval?: string;
+  presentation?: string;
+}) => {
+  const res = await api.post("/patient-medications", data);
+  return res.data;
+};
+
+export const deletePatientMedication = async (id: number) => {
+  const res = await api.delete(`/patient-medications/${id}`);
+  return res.data;
+};
+
 export default api;
