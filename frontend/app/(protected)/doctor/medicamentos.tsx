@@ -25,7 +25,7 @@ interface PatientMed {
   id: number;
   dose: string | null;
   interval: string | null;
-  presentation: string | null;
+  startDate: string | null;
   medication: { id: number; name: string };
 }
 
@@ -86,6 +86,7 @@ export default function Medicamentos() {
         medicationId: medication.id,
         dose: form.dose || undefined,
         interval: form.interval || undefined,
+        startDate: new Date().toISOString(),
       });
       setForm({ name: "", dose: "", interval: "" });
       load();

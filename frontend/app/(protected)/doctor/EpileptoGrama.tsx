@@ -18,7 +18,7 @@ interface MedEntry {
   id: number;
   dose: string | null;
   interval: string | null;
-  presentation: string | null;
+  startDate: string | null;
   medication: { name: string };
 }
 
@@ -142,6 +142,11 @@ export default function EpileptoGrama() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.medName}>{m.medication.name}</Text>
                 <Text style={styles.medMeta}>{[m.dose, m.interval].filter(Boolean).join(" · ") || "Sin dosis registrada"}</Text>
+                {m.startDate && (
+                  <Text style={styles.medDate}>
+                    Inicio: {new Date(m.startDate).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+                  </Text>
+                )}
               </View>
             </View>
           ))
