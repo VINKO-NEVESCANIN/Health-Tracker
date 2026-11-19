@@ -2,7 +2,7 @@ import { useState,useEffect } from 'react';
 import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { getUserById, updateInfo } from 'services/api';
+import { getUserById, updateInfo } from '@services/api';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function EditarPaciente() {
