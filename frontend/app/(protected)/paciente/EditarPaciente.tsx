@@ -1,286 +1,254 @@
-import { useState,useEffect } from 'react';
-import { Switch, TextInput,Button, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { getUserById, updateInfo } from '@services/api';
-import { useLocalSearchParams } from 'expo-router';
+import { getUserById, updateInfo } from "@services/api";
+import { useAuth } from "@context/auth";
+import { theme, shadow } from "@constants/theme";
 
-export default function EditarPaciente() {
-
-  const params = useLocalSearchParams();
-  const id = params.id ? Number(params.id) : null;
-  const idedit = id;
-
-  useEffect(() => {
-  if (id) {
-    getUserById(id)
-      .then(p => {
-        // 👇 llena tus estados con los datos del backend
-        setInputs([p.firstName, p.lastName, String(p.height), String(p.weight)]);
-        setFecha1(new Date(p.birthdate));
-        setFecha2(new Date(p.firstCrisisDate));
-        setGenero(p.gender);
-        setEpilepsyType(p.epilepsyType);
-        setChecks({
-          anxiety: p.anxiety,
-          migraine: p.migraine,
-          addictions: p.addictions,
-          hypertension: p.hypertension,
-          cogniDisorder: p.cogniDisorder,
-          respiDisorder: p.respiDisorder,
-      });
-      })
-      .catch(err => 
-        console.error("Error cargando paciente:", err)
-      );
-  }
-}, [id]);
-
-  const labels = ['Nombre', 'Primer Apellido', 'Altura', 'Peso'];
-
-  // 5 inputs normales
-  const [inputs, setInputs] = useState(Array(4).fill(''));
-
-  // 2 fechas
-  const [fecha1, setFecha1] = useState(new Date());
-  const [fecha2, setFecha2] = useState(new Date());
-  const [showFecha1, setShowFecha1] = useState(false);
-  const [showFecha2, setShowFecha2] = useState(false);
-
-  // 2 selectores
-  const [genero, setGenero] = useState('A');
-  const [epilepsyType, setEpilepsyType] = useState('X');
-
-  // 7 checkboxes (Switch)
-const Checkbox = [
+const GENDERS = ["Masculino", "Femenino", "Otro"];
+const EPILEPSY_TYPES = ["Focal", "Generalizada", "Focal y generalizada", "Desconocida"];
+const CONDITIONS = [
   { key: "anxiety", label: "Ansiedad" },
   { key: "migraine", label: "Migraña" },
   { key: "addictions", label: "Adicciones" },
   { key: "hypertension", label: "Hipertensión" },
   { key: "cogniDisorder", label: "Trastorno cognitivo" },
   { key: "respiDisorder", label: "Trastorno respiratorio" },
-];
+] as const;
 
-// Estado inicial como objeto
-const [checks, setChecks] = useState<{ [k: string]: boolean }>(
-  Object.fromEntries(Checkbox.map(f => [f.key, false]))
-);
+type CondKey = (typeof CONDITIONS)[number]["key"];
 
+const fmtDate = (d: Date | null) =>
+  d ? d.toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }) : "Seleccionar fecha";
+
+export default function EditarPaciente() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { id: idParam } = useLocalSearchParams<{ id?: string }>();
+  const id = idParam ? Number(idParam) : null;
+  const isSelf = !!user && user.id === id;
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [firstTime, setFirstTime] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [gender, setGender] = useState<string | null>(null);
+  const [epilepsyType, setEpilepsyType] = useState<string | null>(null);
+  const [birthdate, setBirthdate] = useState<Date | null>(null);
+  const [firstCrisis, setFirstCrisis] = useState<Date | null>(null);
+  const [picker, setPicker] = useState<"birth" | "crisis" | null>(null);
+  const [checks, setChecks] = useState<Record<CondKey, boolean>>({
+    anxiety: false,
+    migraine: false,
+    addictions: false,
+    hypertension: false,
+    cogniDisorder: false,
+    respiDisorder: false,
+  });
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    getUserById(id)
+      .then((p) => {
+        setFirstTime(!!p.firstTime);
+        setFirstName(p.firstName ?? "");
+        setLastName(p.lastName ?? "");
+        setHeight(p.height ?? "");
+        setWeight(p.weight ?? "");
+        setGender(p.gender ?? null);
+        setEpilepsyType(p.epilepsyType ?? null);
+        setBirthdate(p.birthdate ? new Date(p.birthdate) : null);
+        setFirstCrisis(p.firstCrisisDate ? new Date(p.firstCrisisDate) : null);
+        setChecks({
+          anxiety: !!p.anxiety,
+          migraine: !!p.migraine,
+          addictions: !!p.addictions,
+          hypertension: !!p.hypertension,
+          cogniDisorder: !!p.cogniDisorder,
+          respiDisorder: !!p.respiDisorder,
+        });
+      })
+      .catch(() => Alert.alert("Error", "No se pudieron cargar los datos."))
+      .finally(() => setLoading(false));
+  }, [id]);
 
   const guardar = async () => {
-    if (!idedit) {
-        alert("ID inválido");
-        return;
-      }
-    const datos = {
-      firstName: inputs[0],
-      lastName: inputs[1],
-      height: inputs[2],
-      weight: inputs[3],
-      birthdate: fecha1,
-      firstCrisisDate: fecha2,
-      gender: genero,
-      epilepsyType: epilepsyType,
-      anxiety: checks.anxiety,
-      migraine: checks.migraine,
-      addictions: checks.addictions,
-      hypertension: checks.hypertension,
-      cogniDisorder: checks.cogniDisorder,
-      respiDisorder: checks.respiDisorder
-    };
+    if (!id) {
+      Alert.alert("Error", "No se pudo identificar al paciente.");
+      return;
+    }
+    if (!firstName.trim()) {
+      Alert.alert("Falta información", "Escribe el nombre.");
+      return;
+    }
+    setSaving(true);
     try {
-    const paciente = await updateInfo(idedit, datos);
-    console.log("Paciente guardado:", paciente);
-    alert("Paciente guardado correctamente");
-  } catch (err: any) {
-    console.error("Error guardando paciente:", err.response?.data || err.message);
-    alert("Error al guardar paciente");
-  }
-  }
-    return (
-      <ImageBackground
-         source={require('../../../assets/images/FondoApp.png')} // Ruta de tu imagen
-            style={styles.fondo}
-            resizeMode="cover"
-          >
-      <ScrollView contentContainerStyle={styles.contenedor}>
-      <Text style={styles.titulo}>Editar Usuario</Text>
+      await updateInfo(id, {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        height: height.trim(),
+        weight: weight.trim(),
+        gender,
+        epilepsyType,
+        birthdate: birthdate?.toISOString(),
+        firstCrisisDate: firstCrisis?.toISOString(),
+        ...checks,
+      });
+      if (isSelf && firstTime) router.replace("/(protected)/home");
+      else router.back();
+    } catch {
+      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-       <View style={styles.contenedor}>
-      {labels.map((label, index) => (
-        <View key={index} style={styles.item}>
-          {/* Texto como label */}
-          <Text style={styles.label}>{label}</Text>
+  if (loading) return <ActivityIndicator size="large" color={theme.purple600} style={{ marginTop: 48 }} />;
 
-          {/* Input asociado */}
-          <TextInput
-            value={inputs[index]}
-            onChangeText={(text) => {
-              const nuevos = [...inputs];
-              nuevos[index] = text;
-              setInputs(nuevos);
-            }}
-            placeholder={`Escribe ${label}`}
-            placeholderTextColor="#888"
-            style={styles.input}
+  const Chips = ({ options, value, onChange }: { options: string[]; value: string | null; onChange: (v: string) => void }) => (
+    <View style={styles.chips}>
+      {options.map((o) => {
+        const active = o === value;
+        return (
+          <Pressable key={o} style={[styles.chip, active && styles.chipActive]} onPress={() => onChange(o)}>
+            <Text style={[styles.chipText, active && styles.chipTextActive]}>{o}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+
+  const DateField = ({ value, onPress }: { value: Date | null; onPress: () => void }) => (
+    <Pressable style={[styles.field, shadow]} onPress={onPress}>
+      <Ionicons name="calendar-outline" size={18} color={theme.purple600} />
+      <Text style={[styles.fieldText, !value && { color: theme.gray400 }]}>{fmtDate(value)}</Text>
+    </Pressable>
+  );
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <Stack.Screen
+        options={{
+          title: isSelf && firstTime ? "Completa tu perfil" : "Editar paciente",
+          headerBackVisible: !(isSelf && firstTime),
+        }}
+      />
+      {isSelf && firstTime && (
+        <Text style={styles.intro}>Cuéntanos un poco sobre ti para empezar. Podrás cambiarlo después.</Text>
+      )}
+
+      <Text style={styles.section}>Datos personales</Text>
+      <Text style={styles.label}>Nombre</Text>
+      <TextInput style={[styles.input, shadow]} value={firstName} onChangeText={setFirstName} placeholder="Nombre" placeholderTextColor={theme.gray400} />
+      <Text style={styles.label}>Apellidos</Text>
+      <TextInput style={[styles.input, shadow]} value={lastName} onChangeText={setLastName} placeholder="Apellidos" placeholderTextColor={theme.gray400} />
+
+      <View style={styles.twoCols}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Altura (cm)</Text>
+          <TextInput style={[styles.input, shadow]} value={height} onChangeText={setHeight} keyboardType="numeric" placeholder="170" placeholderTextColor={theme.gray400} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Peso (kg)</Text>
+          <TextInput style={[styles.input, shadow]} value={weight} onChangeText={setWeight} keyboardType="numeric" placeholder="70" placeholderTextColor={theme.gray400} />
+        </View>
+      </View>
+
+      <Text style={styles.label}>Género</Text>
+      <Chips options={GENDERS} value={gender} onChange={setGender} />
+
+      <Text style={styles.label}>Fecha de nacimiento</Text>
+      <DateField value={birthdate} onPress={() => setPicker("birth")} />
+
+      <Text style={styles.section}>Epilepsia</Text>
+      <Text style={styles.label}>Tipo de epilepsia</Text>
+      <Chips options={EPILEPSY_TYPES} value={epilepsyType} onChange={setEpilepsyType} />
+      <Text style={styles.label}>Fecha de la primera crisis</Text>
+      <DateField value={firstCrisis} onPress={() => setPicker("crisis")} />
+
+      <Text style={styles.section}>Antecedentes</Text>
+      {CONDITIONS.map((c) => (
+        <View key={c.key} style={[styles.switchRow, shadow]}>
+          <Text style={styles.switchText}>{c.label}</Text>
+          <Switch
+            value={checks[c.key]}
+            onValueChange={(v) => setChecks((prev) => ({ ...prev, [c.key]: v }))}
+            trackColor={{ false: theme.purple200, true: theme.purple500 }}
+            thumbColor="#fff"
           />
         </View>
       ))}
-    </View>
 
-      {/* Selector Genero */}
-      <Text>Genero:</Text>
-      <Picker selectedValue={genero} onValueChange={setGenero}>
-        <Picker.Item label="Masculino" value="Masculino" />
-        <Picker.Item label="Femenino" value="Femenino" />
-        <Picker.Item label="Otro" value="Otro" />
-      </Picker>
+      <Pressable style={[styles.primary, shadow, saving && { opacity: 0.6 }]} onPress={guardar} disabled={saving}>
+        <Text style={styles.primaryText}>{saving ? "Guardando..." : "Guardar"}</Text>
+      </Pressable>
 
-      {/* Fecha 1 */}
-      <Text>Fecha 1: {fecha1.toLocaleDateString()}</Text>
-      <Button title="Seleccionar Fecha 1" onPress={() => setShowFecha1(true)} />
       <DateTimePickerModal
-        isVisible={showFecha1}
+        isVisible={picker !== null}
         mode="date"
-        onConfirm={(date) => {
-          setFecha1(date);
-          setShowFecha1(false);
+        date={(picker === "birth" ? birthdate : firstCrisis) ?? new Date()}
+        maximumDate={new Date()}
+        onConfirm={(d) => {
+          if (picker === "birth") setBirthdate(d);
+          else setFirstCrisis(d);
+          setPicker(null);
         }}
-        onCancel={() => setShowFecha1(false)}
+        onCancel={() => setPicker(null)}
       />
-
-      {/* Fecha 2 */}
-      <Text>Fecha 2: {fecha2.toLocaleDateString()}</Text>
-      <Button title="Seleccionar Fecha 2" onPress={() => setShowFecha2(true)} />
-      <DateTimePickerModal
-        isVisible={showFecha2}
-        mode="date"
-        onConfirm={(date) => {
-          setFecha2(date);
-          setShowFecha2(false);
-        }}
-        onCancel={() => setShowFecha2(false)}
-      />
-      {/* Selector 1 */}
-      <Text>Tipo de epilepsia:</Text>
-      <Picker selectedValue={epilepsyType} onValueChange={setEpilepsyType}>
-        <Picker.Item label="Valor X" value="X" />
-        <Picker.Item label="Valor Y" value="Y" />
-        <Picker.Item label="Valor Z" value="Z" />
-      </Picker>
-
-      {/* 7 checkboxes con Switch */}
-      <Text style={styles.subtitulo}>Selecciona opciones:</Text>
-      {Checkbox.map(field => (
-        <View key={field.key} style={styles.switchCard}>
-          <Text style={styles.switchLabel}>{field.label}</Text>
-          <Switch
-            value={checks[field.key]}
-      onValueChange={(nuevo) =>
-        setChecks(prev => ({ ...prev, [field.key]: nuevo }))
-      }
-      trackColor={{ false: "#ccc", true: "#7B61FF" }}
-      thumbColor={checks[field.key] ? "#fff" : "#f4f3f4"}
-    />
-  </View>
-))}
-
-
-
-      <Button title="Guardar" onPress={guardar}/>
     </ScrollView>
-      </ImageBackground>
-    );
-  }
+  );
+}
 
-
-   const styles = StyleSheet.create({
-
-  fondo:{
-    flex: 1,
-  },
-
-  ListaPacientes:{
-    backgroundColor: "#C9B1FF",
-    width: 120,
-    height: 120,
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: theme.purple100 },
+  content: { padding: 16, paddingBottom: 40 },
+  intro: { color: theme.gray700, marginBottom: 4 },
+  section: { fontSize: 18, fontWeight: "bold", color: theme.purple700, marginTop: 24 },
+  label: { fontWeight: "600", color: theme.gray700, marginTop: 14, marginBottom: 8 },
+  input: { backgroundColor: "#fff", borderRadius: 14, padding: 14, color: theme.gray800 },
+  twoCols: { flexDirection: "row", gap: 12 },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chip: {
+    backgroundColor: "#fff",
     borderRadius: 20,
-    borderWidth: 2,
-
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: theme.purple200,
   },
-   pantalla: {
-    flex: 1,
-    paddingTop: 40,
+  chipActive: { backgroundColor: theme.purple600, borderColor: theme.purple600 },
+  chipText: { color: theme.gray700 },
+  chipTextActive: { color: "#fff", fontWeight: "600" },
+  field: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#fff", borderRadius: 14, padding: 14 },
+  fieldText: { color: theme.gray800 },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 10,
   },
-  contenedor: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-  },
-
-  switchCard: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  backgroundColor: '#ffffff',
-  padding: 12,
-  borderRadius: 10,
-  marginBottom: 10,
-},
-
-switchLabel: {
-  fontSize: 16,
-  color: '#000',
-},
-
-  fila: {
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  input: {
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: "#000000ff",
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: '#ffffff',
-    alignSelf: 'center',
-    width: '95%',
-  },
-  contenedor2: {
-    padding: 20,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  subtitulo: {
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  input2: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 16,
-    color: '#000',
-    marginBottom: 12,
-    elevation: 2,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 16,
-    paddingLeft: 10,
-    marginBottom: 4,
-  },
-  item: {
-
-  },
-
+  switchText: { color: theme.gray800, flex: 1 },
+  primary: { backgroundColor: theme.purple600, borderRadius: 14, paddingVertical: 15, alignItems: "center", marginTop: 28 },
+  primaryText: { color: "#fff", fontWeight: "bold", fontSize: 15 },
 });

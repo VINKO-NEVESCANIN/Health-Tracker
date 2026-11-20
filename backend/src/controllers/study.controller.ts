@@ -2,9 +2,11 @@
 import { Request, Response } from "express";
 import prisma from "../config/db";
 
-export const createStudy = async (req: Request, res: Response) => {
+export const createStudy = async (req: any, res: Response) => {
   try {
-    const { patientId, dateEEG, dateRMNC, dateNSMAP, resEEG, resRMNC, resNSMAP} = req.body;
+    const { dateEEG, dateRMNC, dateNSMAP, resEEG, resRMNC, resNSMAP} = req.body;
+    // Un paciente solo puede registrar estudios propios
+    const patientId = String(req.role).toLowerCase() === "paciente" ? req.userId : req.body.patientId;
     if (!patientId) return res.status(400).json({ error: "patientId requeridos" });
 
     const study = await prisma.study.create({
@@ -36,9 +38,13 @@ export const getPatientStudies = async (req: Request, res: Response) => {
   }
 };
 
-export const updateStudies = async (req: Request, res: Response) => {
+export const updateStudies = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
+    if (String(req.role).toLowerCase() === "paciente") {
+      const own = await prisma.study.findUnique({ where: { id } });
+      if (!own || own.patientId !== req.userId) return res.status(403).json({ error: "Acceso denegado" });
+    }
     const { dateEEG, dateRMNC, dateNSMAP, resEEG, resRMNC, resNSMAP } = req.body;
 
     const study = await prisma.study.update({

@@ -19,8 +19,6 @@ export default function PacienteLayout() {
       <Stack.Screen name="HistorialCrisis" options={{ title: "Historial de crisis" }} />
       <Stack.Screen name="MisCitas" options={{ title: "Mis Citas" }} />
       <Stack.Screen name="EditarCita" options={{ title: "Cita" }} />
-      <Stack.Screen name="MisMedicamentos" options={{ title: "Medicamentos" }} />
-      <Stack.Screen name="AgregarMedicamento" options={{ title: "Agregar medicamento" }} />
       <Stack.Screen name="EstudiosPrevios" options={{ title: "Estudios" }} />
     </Stack>
   );

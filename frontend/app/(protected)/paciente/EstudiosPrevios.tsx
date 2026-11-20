@@ -1,136 +1,130 @@
-import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
-import { Button, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
-import DateTimePicker from "react-native-modal-datetime-picker";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { getPatientStudies, createStudy, updateStudy } from "@services/api";
+import { useAuth } from "@context/auth";
+import { theme, shadow } from "@constants/theme";
 
-// ✅ IMPORT CORRECTO
-import fondo from '@assets/images/FondoApp.png';
+type Key = "EEG" | "RMNC" | "NSMAP";
+const TYPES: { key: Key; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { key: "NSMAP", label: "Niveles séricos", icon: "flask" },
+  { key: "RMNC", label: "RMN de cráneo", icon: "scan" },
+  { key: "EEG", label: "Electroencefalograma", icon: "pulse" },
+];
+const RESULTS = ["No Realizado", "Normal", "Anormal"];
 
+// El paciente captura/consulta sus propios estudios previos (un registro por paciente)
 export default function EstudiosPrevios() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [studyId, setStudyId] = useState<number | null>(null);
+  const [res, setRes] = useState<Record<Key, string>>({ EEG: "No Realizado", RMNC: "No Realizado", NSMAP: "No Realizado" });
+  const [dates, setDates] = useState<Record<Key, Date>>({ EEG: new Date(), RMNC: new Date(), NSMAP: new Date() });
+  const [picker, setPicker] = useState<Key | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const [NivSericos, setNivSericos] = useState("");
-  const [RMNCraneo, setRMNCraneo] = useState("");
-  const [Electrocenfalograma, setElectrocenfalograma] = useState("");
+  useEffect(() => {
+    if (!user) return;
+    getPatientStudies(user.id)
+      .then((list) => {
+        const s = list[0];
+        if (!s) return;
+        setStudyId(s.id);
+        setRes({ EEG: s.resEEG ?? "No Realizado", RMNC: s.resRMNC ?? "No Realizado", NSMAP: s.resNSMAP ?? "No Realizado" });
+        setDates({
+          EEG: s.dateEEG ? new Date(s.dateEEG) : new Date(),
+          RMNC: s.dateRMNC ? new Date(s.dateRMNC) : new Date(),
+          NSMAP: s.dateNSMAP ? new Date(s.dateNSMAP) : new Date(),
+        });
+      })
+      .catch(() => Alert.alert("Error", "No se pudieron cargar tus estudios."))
+      .finally(() => setLoading(false));
+  }, [user]);
 
-  const [FechaNivSericos, setFechaNivSericos] = useState(new Date());
-  const [showFechaNivSericos, setShowFechaNivSericos] = useState(false);
+  const guardar = async () => {
+    if (!user) return;
+    setSaving(true);
+    const body = {
+      dateEEG: dates.EEG.toISOString(),
+      dateRMNC: dates.RMNC.toISOString(),
+      dateNSMAP: dates.NSMAP.toISOString(),
+      resEEG: res.EEG,
+      resRMNC: res.RMNC,
+      resNSMAP: res.NSMAP,
+    };
+    try {
+      if (studyId) await updateStudy(studyId, body);
+      else await createStudy({ patientId: user.id, ...body });
+      router.back();
+    } catch {
+      Alert.alert("Error", "No se pudieron guardar los estudios.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const [FechaEncefalograma, setFechaEncefalograma] = useState(new Date());
-  const [showFechaEncefalograma, setShowFechaEncefalograma] = useState(false);
-
-  const Resultado = [
-    { label: "No Realizado", value: "No Realizado" },
-    { label: "Anormal", value: "Anormal" },
-    { label: "Normal", value: "Normal" },
-  ];
+  if (loading) return <ActivityIndicator size="large" color={theme.purple600} style={{ marginTop: 48 }} />;
 
   return (
-    <ImageBackground
-      source={fondo} // ✅ FIX
-      style={{ flex: 1 }}
-    >
-      <ScrollView style={styles.contenedor}>
-
-        <Text style={styles.title}>Niveles Séricos:</Text>
-        <Picker
-          selectedValue={NivSericos}
-          onValueChange={(val) => setNivSericos(val)}
-          style={styles.pickers}
-        >
-          {Resultado.map((item) => (
-            <Picker.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.title}>Fecha de Niveles Séricos:</Text>
-        <Button
-          color='#6631D7'
-          title={FechaNivSericos.toLocaleDateString()}
-          onPress={() => setShowFechaNivSericos(true)}
-        />
-
-        <DateTimePicker
-          isVisible={showFechaNivSericos} // ✅ FIX
-          mode="date"
-          onConfirm={(date) => {
-            setFechaNivSericos(date);
-            setShowFechaNivSericos(false);
-          }}
-          onCancel={() => setShowFechaNivSericos(false)}
-        />
-
-        <Text style={styles.title}>RMN de Cráneo:</Text>
-        <Picker
-          selectedValue={RMNCraneo}
-          onValueChange={(val) => setRMNCraneo(val)}
-          style={styles.pickers}
-        >
-          {Resultado.map((item) => (
-            <Picker.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.title}>Electroencefalograma:</Text>
-        <Picker
-          selectedValue={Electrocenfalograma}
-          onValueChange={(val) => setElectrocenfalograma(val)}
-          style={styles.pickers}
-        >
-          {Resultado.map((item) => (
-            <Picker.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.title}>Fecha de Electroencefalograma:</Text>
-        <Button
-          color='#6631D7'
-          title={FechaEncefalograma.toLocaleDateString()}
-          onPress={() => setShowFechaEncefalograma(true)}
-        />
-
-        <DateTimePicker
-          isVisible={showFechaEncefalograma} // ✅ FIX
-          mode="date"
-          onConfirm={(date) => {
-            setFechaEncefalograma(date);
-            setShowFechaEncefalograma(false);
-          }}
-          onCancel={() => setShowFechaEncefalograma(false)}
-        />
-
-        <View style={styles.botonesContainer}>
-          <Button color='#6631D7' title="Guardar" onPress={() => {}} />
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      {TYPES.map((t) => (
+        <View key={t.key} style={[styles.block, shadow]}>
+          <View style={styles.blockHeader}>
+            <Ionicons name={t.icon} size={18} color={theme.purple500} />
+            <Text style={styles.blockTitle}>{t.label}</Text>
+          </View>
+          <View style={styles.chips}>
+            {RESULTS.map((r) => {
+              const active = res[t.key] === r;
+              return (
+                <Pressable key={r} style={[styles.chip, active && styles.chipActive]} onPress={() => setRes({ ...res, [t.key]: r })}>
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{r}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Pressable style={styles.dateField} onPress={() => setPicker(t.key)}>
+            <Ionicons name="calendar-outline" size={16} color={theme.purple600} />
+            <Text style={styles.dateText}>{dates[t.key].toLocaleDateString("es-MX")}</Text>
+          </Pressable>
         </View>
+      ))}
 
-        <View style={styles.botonesContainer}>
-          <Button color='white' title="Cancelar" onPress={() => {}} />
-        </View>
+      <Pressable style={[styles.primary, shadow, saving && { opacity: 0.6 }]} onPress={guardar} disabled={saving}>
+        <Text style={styles.primaryText}>{saving ? "Guardando..." : "Guardar"}</Text>
+      </Pressable>
 
-      </ScrollView>
-    </ImageBackground>
+      <DateTimePickerModal
+        isVisible={!!picker}
+        mode="date"
+        date={picker ? dates[picker] : new Date()}
+        maximumDate={new Date()}
+        onConfirm={(d) => {
+          if (picker) setDates({ ...dates, [picker]: d });
+          setPicker(null);
+        }}
+        onCancel={() => setPicker(null)}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  contenedor: {
-    paddingHorizontal: 16,
-    paddingBottom: 20
-  },
-
-  title: {
-    fontSize: 18,
-    marginVertical: 10
-  },
-
-  botonesContainer: {
-    paddingBottom: 10,
-    paddingTop: 10
-  },
-
-  pickers: {
-    backgroundColor: "white",
-    width: "100%",
-    borderRadius: 10,
-    borderWidth: 2
-  }
+  screen: { flex: 1, backgroundColor: theme.purple100 },
+  content: { padding: 16, paddingBottom: 40 },
+  block: { backgroundColor: "#fff", borderRadius: 18, padding: 16, marginBottom: 14, gap: 12 },
+  blockHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  blockTitle: { fontWeight: "700", color: theme.gray800, fontSize: 15 },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chip: { backgroundColor: theme.purple50, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: theme.purple200 },
+  chipActive: { backgroundColor: theme.purple600, borderColor: theme.purple600 },
+  chipText: { color: theme.gray700 },
+  chipTextActive: { color: "#fff", fontWeight: "600" },
+  dateField: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dateText: { color: theme.gray700 },
+  primary: { backgroundColor: theme.purple600, borderRadius: 14, paddingVertical: 15, alignItems: "center", marginTop: 10 },
+  primaryText: { color: "#fff", fontWeight: "bold", fontSize: 15 },
 });

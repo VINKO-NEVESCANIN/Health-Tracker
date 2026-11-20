@@ -89,34 +89,37 @@ export const updateAccess = async (req: Request, res: Response) => {
 export const updateInfo = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
+    const b = req.body;
+    const bool = (v: any) => v === true || v === "true";
+    const date = (v: any) => (v ? new Date(v) : undefined);
 
-    console.log("Body recibido en updateInfo:", req.body);
+    const birthdate = date(b.birthdate);
+    const age =
+      birthdate && !isNaN(birthdate.getTime())
+        ? Math.floor((Date.now() - birthdate.getTime()) / (365.25 * 24 * 3600 * 1000))
+        : undefined;
 
-    const data = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-        gender: req.body.gender,
-        height: req.body.height,
-        weight: req.body.weight,
-        birthdate: new Date(req.body.birthdate),
-        firstCrisisDate: new Date(req.body.firstCrisisDate),
-        epilepsyType: req.body.epilepsyType,
-        anxiety: req.body.anxiety === true || req.body.anxiety === "true",
-        migraine: req.body.migraine === true || req.body.migraine === "true",
-        addictions: req.body.addictions === true || req.body.addictions === "true",
-        hypertension: req.body.hypertension === true || req.body.hypertension === "true",
-        cogniDisorder: req.body.cogniDisorder === true || req.body.cogniDisorder === "true",
-        respiDisorder: req.body.respiDisorder === true || req.body.respiDisorder === "true",
+    const data: any = {
+      firstName: b.firstName,
+      lastName: b.lastName,
+      gender: b.gender,
+      height: b.height != null ? String(b.height) : undefined,
+      weight: b.weight != null ? String(b.weight) : undefined,
+      birthdate,
+      age,
+      firstCrisisDate: date(b.firstCrisisDate),
+      epilepsyType: b.epilepsyType,
+      anxiety: b.anxiety !== undefined ? bool(b.anxiety) : undefined,
+      migraine: b.migraine !== undefined ? bool(b.migraine) : undefined,
+      addictions: b.addictions !== undefined ? bool(b.addictions) : undefined,
+      hypertension: b.hypertension !== undefined ? bool(b.hypertension) : undefined,
+      cogniDisorder: b.cogniDisorder !== undefined ? bool(b.cogniDisorder) : undefined,
+      respiDisorder: b.respiDisorder !== undefined ? bool(b.respiDisorder) : undefined,
+      // Al guardar el perfil por primera vez ya no es "primer ingreso"
+      firstTime: false,
+    };
 
-      };
-
-       console.log("Data que se manda a Prisma:", data);
-
-      const user = await prisma.user.update({
-      where: { id },
-      data,
-    });
-    
+    const user = await prisma.user.update({ where: { id }, data });
     res.json(user);
   } catch (err) {
     console.error(err);

@@ -22,7 +22,6 @@ export default function DoctorLayout() {
       <Stack.Screen name="AgregarPaciente" options={{ headerShown: false }} />
       <Stack.Screen name="medicamentos" options={{ headerShown: false }} />
       <Stack.Screen name="estudios" options={{ title: "Estudios" }} />
-      <Stack.Screen name="MisCrisis" options={{ title: "Crisis" }} />
     </Stack>
   );
 }
