@@ -16,7 +16,8 @@ export const authMiddleware = (roles: string[] = []) => {
       req.userId = decoded.userId;
       req.role = decoded.role;
 
-      if (roles.length && !roles.includes(decoded.role)) {
+      const allowed = roles.map((r) => r.toLowerCase());
+      if (allowed.length && !allowed.includes(String(decoded.role).toLowerCase())) {
         return res.status(403).json({ error: "Acceso denegado" });
       }
 

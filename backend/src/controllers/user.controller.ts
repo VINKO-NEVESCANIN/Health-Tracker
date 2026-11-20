@@ -6,17 +6,26 @@ export const createUser = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role, doctorId } = req.body;
 
   if (!password) return res.status(400).json({ error: "password requerido" });
-  const hashedPassword = await bcrypt.hash(password, 10);
+  if (!email) return res.status(400).json({ error: "email requerido" });
 
-  const user = await prisma.user.create({ data: {
-     firstName,
-     lastName,
-     email,
-     password: hashedPassword,
-     role: role || "user",
-     doctorId: doctorId ? Number(doctorId) : undefined,
-     } });
-  res.json(user);
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) return res.status(400).json({ error: "Ese correo ya está registrado" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({ data: {
+       firstName,
+       lastName,
+       email,
+       password: hashedPassword,
+       role: role || "user",
+       doctorId: doctorId ? Number(doctorId) : undefined,
+       } });
+    res.json(user);
+  } catch (err: any) {
+    console.error("Error creando usuario:", err);
+    res.status(500).json({ error: "No se pudo crear el usuario", detail: err.message });
+  }
 };
 
 export const getUsers = async (req: any, res: Response) => {

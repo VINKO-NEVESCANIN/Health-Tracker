@@ -149,4 +149,81 @@ export const deletePatientMedication = async (id: number) => {
   return res.data;
 };
 
+// ---------- Citas ----------
+export interface Appointment {
+  id: number;
+  patientId: number;
+  doctorId: number;
+  date: string;
+  time: string;
+  notes: string | null;
+  status: string;
+  patient: { id: number; firstName: string | null; lastName: string | null; age: number | null; epilepsyType: string | null } | null;
+  doctor: { id: number; firstName: string | null; lastName: string | null } | null;
+}
+
+export const getAppointments = async (): Promise<Appointment[]> => {
+  const res = await api.get("/appointments");
+  return res.data;
+};
+
+export const getMyAppointments = async (): Promise<Appointment[]> => {
+  const res = await api.get("/appointments/mine");
+  return res.data;
+};
+
+export const createAppointment = async (data: { patientId: number; date: string; time: string; notes?: string }) => {
+  const res = await api.post("/appointments", data);
+  return res.data;
+};
+
+export const updateAppointment = async (id: number, data: { date?: string; time?: string; notes?: string; status?: string }) => {
+  const res = await api.put(`/appointments/${id}`, data);
+  return res.data;
+};
+
+export const deleteAppointment = async (id: number) => {
+  const res = await api.delete(`/appointments/${id}`);
+  return res.data;
+};
+
+// ---------- Estudios ----------
+export interface Study {
+  id: number;
+  patientId: number;
+  dateEEG: string | null;
+  dateNSMAP: string | null;
+  dateRMNC: string | null;
+  resEEG: string | null;
+  resNSMAP: string | null;
+  resRMNC: string | null;
+  patient?: { id: number; firstName: string | null; lastName: string | null };
+}
+
+export const getAllStudies = async (): Promise<Study[]> => {
+  const res = await api.get("/studies");
+  return res.data;
+};
+
+export const getPatientStudies = async (patientId: number): Promise<Study[]> => {
+  const res = await api.get(`/studies/patient/${patientId}`);
+  return res.data;
+};
+
+export const createStudy = async (data: Partial<Study> & { patientId: number }) => {
+  const res = await api.post("/studies", data);
+  return res.data;
+};
+
+export const updateStudy = async (id: number, data: Partial<Study>) => {
+  const res = await api.put(`/studies/${id}`, data);
+  return res.data;
+};
+
+// ---------- Resumen del doctor ----------
+export const getDoctorSummary = async (): Promise<{ appointmentsToday: number; activePatients: number; crisisLast7Days: number }> => {
+  const res = await api.get("/summary");
+  return res.data;
+};
+
 export default api;

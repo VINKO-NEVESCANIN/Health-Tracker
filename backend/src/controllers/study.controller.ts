@@ -47,9 +47,9 @@ export const updateStudies = async (req: Request, res: Response) => {
         dateEEG: dateEEG ? new Date(dateEEG) : undefined,
         dateRMNC: dateRMNC ? new Date(dateRMNC) : undefined,
         dateNSMAP: dateNSMAP ? new Date(dateNSMAP) : undefined,
-        resEEG: resEEG ?? null,
-        resRMNC: resRMNC ?? null,
-        resNSMAP: resNSMAP ?? null
+        resEEG: resEEG,
+        resRMNC: resRMNC,
+        resNSMAP: resNSMAP
       },
     });
     res.json(study);
@@ -67,5 +67,19 @@ export const deleteStudy = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error eliminando estudio" });
+  }
+};
+
+// Estudios de todos los pacientes, con el nombre del paciente (vista del doctor)
+export const getAllStudies = async (_req: Request, res: Response) => {
+  try {
+    const studies = await prisma.study.findMany({
+      include: { patient: { select: { id: true, firstName: true, lastName: true } } },
+      orderBy: { id: "desc" },
+    });
+    res.json(studies);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo estudios" });
   }
 };

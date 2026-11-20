@@ -1,78 +1,93 @@
-import { router } from 'expo-router';
-import { ImageBackground, StyleSheet, Text, Image, Pressable, FlatList } from 'react-native';
-
-// ✅ IMPORTS
-import fondo from '@assets/images/FondoApp.png';
-import juan from '@assets/images/JuanPaciente.jpg';
-import paciente2 from '@assets/images/Paciente2.jpg';
-import paciente3 from '@assets/images/Paciente3.jpeg';
-import paciente4 from '@assets/images/PacienteP.jpeg';
+import React, { useCallback, useState } from "react";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { getMyAppointments, Appointment } from "@services/api";
+import { theme, shadow } from "@constants/theme";
 
 export default function MisCitas() {
+  const [items, setItems] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const items = [
-    { id: 1, name: 'Doctor 1', Fecha: '04-01-2026', Hora: '12:30 PM', Image: juan, Resumen: 'Resumen de la Cita' },
-    { id: 2, name: 'Doctor 2', Fecha: '12-01-2026', Hora: '02:00 PM', Image: paciente2, Resumen: 'Resumen de la Cita' },
-    { id: 3, name: 'Doctor 3', Fecha: '26-01-2026', Hora: '04:30 PM', Image: paciente3, Resumen: 'Resumen de la Cita' },
-    { id: 4, name: 'Doctor 4', Fecha: '02-02-2026', Hora: '07:00 PM', Image: paciente4, Resumen: 'Resumen de la Cita' },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      getMyAppointments()
+        .then((d) => {
+          setItems(d);
+          setError("");
+        })
+        .catch(() => setError("No se pudieron cargar tus citas."))
+        .finally(() => setLoading(false));
+    }, [])
+  );
+
+  if (loading) return <ActivityIndicator size="large" color={theme.purple600} style={{ marginTop: 48 }} />;
 
   return (
-    <ImageBackground
-      source={fondo}
-      style={styles.fondo}
-      resizeMode="cover"
-    >
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.contenedor}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.card}
-            onPress={() => router.push({
-              pathname: '/(protected)/paciente/EditarCita',
-              params: {
-                condition: '1',
-                id: item.id
-              }
-            })}
-          >
-            <Image source={item.Image} style={styles.foto} />
-            <Text>{item.name}</Text>
-            <Text>{item.Fecha}</Text>
-            <Text>{item.Hora}</Text>
-            <Text>{item.Resumen}</Text>
-          </Pressable>
-        )}
-      />
-    </ImageBackground>
+    <View style={styles.screen}>
+      {error ? (
+        <Text style={styles.error}>{error}</Text>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(i) => String(i.id)}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          ListEmptyComponent={<Text style={styles.empty}>Todavía no tienes citas programadas.</Text>}
+          renderItem={({ item }) => {
+            const d = new Date(item.date);
+            const doc = item.doctor ? `Dr. ${item.doctor.firstName ?? ""} ${item.doctor.lastName ?? ""}`.trim() : "Doctor";
+            return (
+              <View style={[styles.card, shadow]}>
+                <View style={styles.dateBox}>
+                  <Text style={styles.dateDay}>{d.getDate()}</Text>
+                  <Text style={styles.dateMonth}>
+                    {d.toLocaleDateString("es-MX", { month: "short" }).toUpperCase()}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.name}>{doc}</Text>
+                  <View style={styles.row}>
+                    <Ionicons name="time-outline" size={14} color={theme.gray500} />
+                    <Text style={styles.meta}>{item.time || "Sin hora"}</Text>
+                  </View>
+                  {!!item.notes && <Text style={styles.notes}>{item.notes}</Text>}
+                </View>
+              </View>
+            );
+          }}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  fondo: { flex: 1 },
-  contenedor: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-    paddingTop: 16,
-  },
+  screen: { flex: 1, backgroundColor: theme.purple100, padding: 16 },
   card: {
-    alignItems: 'flex-start',
-    backgroundColor: '#CEB5FF',
-    padding: 16,
-    borderRadius: 12,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    borderWidth: 2,
-    marginTop: 10,
-  },
-  foto: {
-    width: 60,
-    height: 60,
-    borderRadius: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 14,
     marginBottom: 12,
   },
+  dateBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: theme.purple50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dateDay: { fontSize: 20, fontWeight: "bold", color: theme.purple600 },
+  dateMonth: { fontSize: 11, color: theme.purple500, fontWeight: "600" },
+  name: { fontWeight: "600", color: theme.gray800, fontSize: 15 },
+  row: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  meta: { fontSize: 13, color: theme.gray500 },
+  notes: { fontSize: 12, color: theme.purple600, marginTop: 4 },
+  error: { color: theme.danger, textAlign: "center", marginTop: 24 },
+  empty: { color: theme.gray500, textAlign: "center", marginTop: 24 },
 });

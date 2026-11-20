@@ -23,12 +23,15 @@ export default function PerfilPaciente() {
   const router = useRouter();
   const [patient, setPatient] = useState<PatientDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const load = useCallback(() => {
     if (!id) return;
     setLoading(true);
+    setError(false);
     getUserById(Number(id))
       .then(setPatient)
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -38,10 +41,23 @@ export default function PerfilPaciente() {
     }, [load])
   );
 
-  if (loading || !patient) {
+  if (loading) {
     return (
       <View style={styles.loadingScreen}>
         <ActivityIndicator size="large" color={theme.purple600} />
+      </View>
+    );
+  }
+
+  if (error || !patient) {
+    return (
+      <View style={[styles.loadingScreen, { padding: 24 }]}>
+        <Text style={{ color: theme.gray700, textAlign: "center", marginBottom: 16 }}>
+          No se pudo cargar la información del paciente.
+        </Text>
+        <Pressable style={styles.linkButton} onPress={load}>
+          <Text style={styles.linkButtonText}>Reintentar</Text>
+        </Pressable>
       </View>
     );
   }
@@ -59,7 +75,7 @@ export default function PerfilPaciente() {
         router.push({ pathname: "/(protected)/paciente/RegistroCrisis", params: { patientId: String(patient.id) } }),
     },
     { icon: "medical" as const, label: "Medicamentos", color: theme.indigo500, onPress: () => router.push({ pathname: "/(protected)/doctor/medicamentos", params: { patientId: String(patient.id) } }) },
-    { icon: "calendar" as const, label: "Citas", color: theme.blue500, onPress: () => router.push("/(protected)/doctor/GestionarCitas") },
+    { icon: "calendar" as const, label: "Citas", color: theme.blue500, onPress: () => router.push({ pathname: "/(protected)/paciente/EditarCita", params: { patientId: String(patient.id) } }) },
   ];
 
   return (
@@ -193,6 +209,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   card: { backgroundColor: "#fff", borderRadius: 20, padding: 20, marginBottom: 20 },
+  linkButton: { backgroundColor: theme.purple600, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  linkButtonText: { color: "#fff", fontWeight: "bold" },
   profileRow: { flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 20 },
   avatar: {
     width: 72,

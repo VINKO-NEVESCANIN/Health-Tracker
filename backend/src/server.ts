@@ -12,6 +12,7 @@ import medicationRoutes from "./routes/medication.routes";
 import patientMedicationRoutes from "./routes/patientMedication.routes";
 import studyRoutes from "./routes/study.routes";
 import crisisRoutes from "./routes/crisis.routes";
+import summaryRoutes from "./routes/summary.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 
@@ -40,6 +41,7 @@ app.use("/medications", medicationRoutes);
 app.use("/patient-medications", patientMedicationRoutes);
 app.use("/studies", studyRoutes);
 app.use("/crisis", crisisRoutes);
+app.use("/summary", summaryRoutes);
 
 // 🔹 Ruta raíz
 app.get("/", (_req, res) => {

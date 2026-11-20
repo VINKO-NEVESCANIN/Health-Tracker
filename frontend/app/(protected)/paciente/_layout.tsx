@@ -1,54 +1,27 @@
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
-
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={20} {...props} />;
-}
+import { Stack } from "expo-router";
+import { theme } from "@constants/theme";
 
 export default function PacienteLayout() {
   return (
-    <Tabs
+    <Stack
       screenOptions={{
-        tabBarActiveTintColor: "#f472b6",
-        tabBarInactiveTintColor: "#a1a1aa",
-        tabBarStyle: {
-          backgroundColor: "#0a0a0a",
-        },
-        headerStyle: { backgroundColor: "#0a0a0a" },
-        headerTintColor: "#f9fafb",
+        headerStyle: { backgroundColor: theme.purple600 },
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Inicio",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="user" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="registro-crisis"
-        options={{
-          title: "Registro",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="exclamation-triangle" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="HistorialCrisis"
-        options={{
-          title: "Historial",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="history" color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="Pacientes" options={{ headerShown: false }} />
+      <Stack.Screen name="PerfilPaciente" options={{ headerShown: false }} />
+      <Stack.Screen name="EditarPaciente" options={{ title: "Editar paciente" }} />
+      <Stack.Screen name="RegistroCrisis" options={{ title: "Registrar crisis" }} />
+      <Stack.Screen name="HistorialCrisis" options={{ title: "Historial de crisis" }} />
+      <Stack.Screen name="MisCitas" options={{ title: "Mis Citas" }} />
+      <Stack.Screen name="EditarCita" options={{ title: "Cita" }} />
+      <Stack.Screen name="MisMedicamentos" options={{ title: "Medicamentos" }} />
+      <Stack.Screen name="AgregarMedicamento" options={{ title: "Agregar medicamento" }} />
+      <Stack.Screen name="EstudiosPrevios" options={{ title: "Estudios" }} />
+    </Stack>
   );
 }

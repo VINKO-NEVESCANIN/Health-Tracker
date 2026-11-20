@@ -1,35 +1,29 @@
 import { useState } from "react";
-import { Switch, Button, ImageBackground, ScrollView, StyleSheet, Text, View, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Switch, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { createCrisis } from "@services/api";
 import { useAuth } from "@context/auth";
+import { theme, shadow } from "@constants/theme";
+
+const minutes = (n: number) =>
+  Array.from({ length: n }, (_, i) => ({ label: `${i + 1} min`, value: i + 1 }));
 
 export default function RegistroCrisis() {
   const { patientId: patientIdParam } = useLocalSearchParams<{ patientId?: string }>();
   const { user } = useAuth();
   const router = useRouter();
-  // Si un doctor navegó aquí desde el perfil de un paciente, usamos ese id;
-  // si no, es el propio paciente registrando su crisis.
+  // Doctor desde el perfil de un paciente -> ese id; paciente -> su propio id.
   const patientId = patientIdParam ? Number(patientIdParam) : user?.id;
 
-  const [duracion, setDuracion] = useState("1 Minutos");
-  const [recuperacion, setRecuperacion] = useState("1 Minutos");
-  const [fecha1, setFecha1] = useState(new Date());
-  const [showFecha1, setShowFecha1] = useState(false);
-  const [check, setCheck] = useState(false);
+  const [duracion, setDuracion] = useState(1);
+  const [recuperacion, setRecuperacion] = useState(1);
+  const [fecha, setFecha] = useState(new Date());
+  const [showFecha, setShowFecha] = useState(false);
+  const [inconsciente, setInconsciente] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const items = Array.from({ length: 60 }, (_, i) => ({
-    label: `${i + 1} Minutos`,
-    value: `${i + 1} Minutos`,
-  }));
-
-  const items2 = Array.from({ length: 8 }, (_, i) => ({
-    label: `${i + 1} Minutos`,
-    value: `${i + 1} Minutos`,
-  }));
 
   const guardar = () => {
     if (!patientId) {
@@ -39,10 +33,10 @@ export default function RegistroCrisis() {
     setSaving(true);
     createCrisis({
       patientId,
-      date: fecha1.toISOString(),
-      duration: parseInt(duracion, 10),
-      recuperation: parseInt(recuperacion, 10),
-      unconscius: check,
+      date: fecha.toISOString(),
+      duration: duracion,
+      recuperation: recuperacion,
+      unconscius: inconsciente,
     })
       .then(() => {
         Alert.alert("Listo", "Crisis registrada correctamente.");
@@ -56,67 +50,90 @@ export default function RegistroCrisis() {
   };
 
   return (
-    <ImageBackground source={require("../../../assets/images/FondoApp.png")} style={styles.fondo} resizeMode="cover">
-      <ScrollView contentContainerStyle={styles.contenedor}>
-        <Text style={styles.title}>Fecha de la crisis:</Text>
-        <Button color='#6631D7' title={fecha1.toLocaleDateString()} onPress={() => setShowFecha1(true)} />
-        <DateTimePickerModal
-          isVisible={showFecha1}
-          mode="date"
-          onConfirm={(date) => {
-            setFecha1(date);
-            setShowFecha1(false);
-          }}
-          onCancel={() => setShowFecha1(false)}
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <Text style={styles.label}>Fecha de la crisis</Text>
+      <Pressable style={[styles.field, shadow]} onPress={() => setShowFecha(true)}>
+        <Ionicons name="calendar-outline" size={18} color={theme.purple600} />
+        <Text style={styles.fieldText}>
+          {fecha.toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}
+        </Text>
+      </Pressable>
+      <DateTimePickerModal
+        isVisible={showFecha}
+        mode="date"
+        date={fecha}
+        onConfirm={(d) => {
+          setFecha(d);
+          setShowFecha(false);
+        }}
+        onCancel={() => setShowFecha(false)}
+      />
+
+      <Text style={styles.label}>Duración de la crisis</Text>
+      <View style={[styles.pickerBox, shadow]}>
+        <Picker selectedValue={duracion} onValueChange={(v) => setDuracion(Number(v))}>
+          {minutes(60).map((i) => (
+            <Picker.Item key={i.value} label={i.label} value={i.value} />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Tiempo de recuperación</Text>
+      <View style={[styles.pickerBox, shadow]}>
+        <Picker selectedValue={recuperacion} onValueChange={(v) => setRecuperacion(Number(v))}>
+          {minutes(60).map((i) => (
+            <Picker.Item key={i.value} label={i.label} value={i.value} />
+          ))}
+        </Picker>
+      </View>
+
+      <View style={[styles.switchRow, shadow]}>
+        <Text style={styles.switchText}>¿Hubo pérdida de conciencia?</Text>
+        <Switch
+          value={inconsciente}
+          onValueChange={setInconsciente}
+          trackColor={{ false: theme.purple200, true: theme.purple500 }}
+          thumbColor="#fff"
         />
+      </View>
 
-        <Text style={styles.title}>Duración de la crisis:</Text>
-        <Picker style={styles.pickers} selectedValue={duracion} onValueChange={(val) => setDuracion(val)}>
-          {items.map((item) => (
-            <Picker.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.title}>Tiempo de recuperación:</Text>
-        <Picker style={[styles.pickers, { marginBottom: 12 }]} selectedValue={recuperacion} onValueChange={(val) => setRecuperacion(val)}>
-          {items2.map((item) => (
-            <Picker.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </Picker>
-        <View style={styles.checkboxContainer}>
-          <Switch value={check} onValueChange={(newValue) => setCheck(newValue)} />
-          <Text style={{ marginLeft: 8, fontSize: 18 }}>¿Tuvo pérdida de conciencia?</Text>
-        </View>
-
-        <Button color='#6631D7' title={saving ? "Guardando..." : "Guardar"} onPress={guardar} disabled={saving} />
-      </ScrollView>
-    </ImageBackground>
+      <Pressable style={[styles.primary, shadow, saving && { opacity: 0.6 }]} onPress={guardar} disabled={saving}>
+        <Text style={styles.primaryText}>{saving ? "Guardando..." : "Guardar crisis"}</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  fondo: { flex: 1 },
-  contenedor: { paddingHorizontal: 16, paddingBottom: 20 },
-  title: { fontSize: 18, marginVertical: 10 },
-  
-  botones:{
-    backgroundColor: "#C9B1FF",
-    width: "100%",
-    height: "15%",
-    borderRadius: 10,
-    borderWidth: 2,
+  screen: { flex: 1, backgroundColor: theme.purple100 },
+  content: { padding: 16, paddingBottom: 40 },
+  label: { fontWeight: "600", color: theme.gray700, marginTop: 16, marginBottom: 8 },
+  field: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
   },
-
-  pickers:{
-    backgroundColor: "white",
-    width: "100%",
-    height: "15%",
-    borderRadius: 10,
-    borderWidth: 2,
+  fieldText: { color: theme.gray800 },
+  pickerBox: { backgroundColor: "#fff", borderRadius: 14, overflow: "hidden" },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 20,
   },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8
+  switchText: { color: theme.gray800, flex: 1, marginRight: 12 },
+  primary: {
+    backgroundColor: theme.purple600,
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginTop: 24,
   },
+  primaryText: { color: "#fff", fontWeight: "bold", fontSize: 15 },
 });

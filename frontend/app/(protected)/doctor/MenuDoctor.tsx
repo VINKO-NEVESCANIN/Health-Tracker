@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, Href } from "expo-router";
+import { useRouter, useFocusEffect, Href } from "expo-router";
+import { getDoctorSummary } from "@services/api";
 import { useAuth } from "@context/auth";
 import { theme, gradients, shadow } from "@constants/theme";
 
@@ -19,6 +20,9 @@ const menuItems: MenuItem[] = [
   { id: 2, title: "Mis Citas", icon: "calendar", color: theme.pink500, ruta: "/doctor/GestionarCitas" },
   { id: 3, title: "Crisis Recientes", icon: "pulse", color: theme.indigo500, ruta: "/doctor/CrisisRecientes" },
   { id: 4, title: "Epileptograma", icon: "document-text", color: theme.blue500, ruta: "/doctor/EpileptoGrama" },
+  { id: 5, title: "Agregar paciente", icon: "person-add", color: theme.purple600, ruta: "/doctor/AgregarPaciente" },
+  { id: 6, title: "Medicamentos", icon: "medkit", color: theme.pink600, ruta: "/doctor/medicamentos" },
+  { id: 7, title: "Estudios", icon: "flask", color: theme.indigo600, ruta: "/doctor/estudios" },
 ];
 
 export default function MenuDoctor() {
@@ -26,6 +30,20 @@ export default function MenuDoctor() {
   const { user } = useAuth();
   const displayName = user?.firstName ?? "Doctor";
   const initial = displayName.charAt(0).toUpperCase();
+  const [summary, setSummary] = useState<{ appointmentsToday: number; activePatients: number; crisisLast7Days: number } | null>(null);
+  const [summaryError, setSummaryError] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      getDoctorSummary()
+        .then((d) => {
+          setSummary(d);
+          setSummaryError(false);
+        })
+        .catch(() => setSummaryError(true));
+    }, [])
+  );
+  const val = (n?: number) => (n == null ? "—" : String(n));
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -55,10 +73,10 @@ export default function MenuDoctor() {
 
       <View style={[styles.summaryCard, shadow]}>
         <Text style={styles.summaryTitle}>Resumen de hoy</Text>
-        <SummaryRow icon="calendar" color={theme.purple600} bg={theme.purple50} label="Citas programadas" value="—" />
-        <SummaryRow icon="people" color={theme.pink600} bg={theme.pink50} label="Pacientes activos" value="—" />
-        <SummaryRow icon="pulse" color={theme.indigo600} bg={theme.indigo50} label="Crisis registradas" value="—" />
-        <Text style={styles.summaryNote}>Estos datos aún no vienen del backend (falta un endpoint de resumen).</Text>
+        <SummaryRow icon="calendar" color={theme.purple600} bg={theme.purple50} label="Citas de hoy" value={val(summary?.appointmentsToday)} />
+        <SummaryRow icon="people" color={theme.pink600} bg={theme.pink50} label="Pacientes activos" value={val(summary?.activePatients)} />
+        <SummaryRow icon="pulse" color={theme.indigo600} bg={theme.indigo50} label="Crisis (últimos 7 días)" value={val(summary?.crisisLast7Days)} />
+        {summaryError && <Text style={styles.summaryNote}>No se pudo cargar el resumen.</Text>}
       </View>
     </ScrollView>
   );
