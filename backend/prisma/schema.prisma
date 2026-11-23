@@ -1,39 +1,38 @@
-datasource db {
-  provider = "postgresql"
-  url = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 model User {
-  id              Int           @id @default(autoincrement())
-  doctorId        Int?
-  firstName       String?
-  lastName        String?
-  email           String        @unique
+  id              Int                 @id @default(autoincrement())
+  email           String              @unique
   password        String
-  firstTime       Boolean      @default(true)
   role            String
-  gender          String?
+  addictions      Boolean?
   age             Int?
-  height          String?
-  weight          String?
+  anxiety         Boolean?
   birthdate       DateTime?
+  cogniDisorder   Boolean?
+  doctorId        Int?
   epilepsyType    String?
   firstCrisisDate DateTime?
-  anxiety         Boolean?
-  migraine        Boolean?
-  addictions      Boolean?
+  firstName       String?
+  firstTime       Boolean             @default(true)
+  gender          String?
+  height          String?
   hypertension    Boolean?
-  cogniDisorder   Boolean?
-  respiDisorder   Boolean?	  
+  lastName        String?
+  migraine        Boolean?
+  respiDisorder   Boolean?
+  weight          String?
+  appointments    Appointment[]
   crisis          Crisis[]
   medications     PatientMedication[]
   studies         Study[]
-  appointments    Appointment[]
 }
 
 model Appointment {
@@ -41,52 +40,52 @@ model Appointment {
   patientId Int
   doctorId  Int
   date      DateTime
-  time      String
   notes     String?
   status    String   @default("scheduled")
+  time      String
   doctor    User     @relation(fields: [doctorId], references: [id])
-
 }
 
 model Medication {
-  id          Int                 @id @default(autoincrement())
-  type        String
-  name        String
+  id           Int                 @id @default(autoincrement())
+  name         String
+  type         String
   abbreviation String
-  patients    PatientMedication[]
+  patients     PatientMedication[]
 }
 
 model PatientMedication {
   id           Int        @id @default(autoincrement())
   patientId    Int
   medicationId Int
-  name         String?
   dose         String?
   interval     String?
-  startDate    DateTime?
-  patient      User    @relation(fields: [patientId], references: [id])
+  presentation String?
+  abbreviation String?
+  name         String?
   medication   Medication @relation(fields: [medicationId], references: [id])
+  patient      User       @relation(fields: [patientId], references: [id])
 }
 
 model Study {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   patientId Int
-  dateEEG   DateTime?
-  dateRMNC  DateTime?
-  dateNSMAP DateTime?	
-  resEEG    String?
-  resRMNC   String?
-  resNSMAP  String?
-  patient   User  @relation(fields: [patientId], references: [id])
+  dateEEG   DateTime? @default(now())
+  dateNSMAP DateTime? @default(now())
+  dateRMNC  DateTime? @default(now())
+  resEEG    String?   @default("No Realizado")
+  resNSMAP  String?   @default("No Realizado")
+  resRMNC   String?   @default("No Realizado")
+  patient   User      @relation(fields: [patientId], references: [id])
 }
 
-
 model Crisis {
-  id          Int      @id @default(autoincrement())
-  patientId   Int
-  crisisDate  DateTime
-  duration    Int?
-  recuperation   Int? 
-  unconscius  Boolean?
-  patient     User  @relation(fields: [patientId], references: [id])
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  crisisDate   DateTime
+  duration     Int?
+  recuperation Int?
+  unconscius   Boolean?
+  medication   String?
+  patient      User     @relation(fields: [patientId], references: [id])
 }

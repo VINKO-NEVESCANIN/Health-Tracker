@@ -1,26 +1,26 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "doctorId" INTEGER,
-    "firstName" TEXT,
-    "lastName" TEXT,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "firstTime" BOOLEAN NOT NULL DEFAULT true,
     "role" TEXT NOT NULL,
-    "gender" TEXT,
+    "addictions" BOOLEAN,
     "age" INTEGER,
-    "height" TEXT,
-    "weight" TEXT,
+    "anxiety" BOOLEAN,
     "birthdate" TIMESTAMP(3),
+    "cogniDisorder" BOOLEAN,
+    "doctorId" INTEGER,
     "epilepsyType" TEXT,
     "firstCrisisDate" TIMESTAMP(3),
-    "anxiety" BOOLEAN,
-    "migraine" BOOLEAN,
-    "addictions" BOOLEAN,
+    "firstName" TEXT,
+    "firstTime" BOOLEAN NOT NULL DEFAULT true,
+    "gender" TEXT,
+    "height" TEXT,
     "hypertension" BOOLEAN,
-    "cogniDisorder" BOOLEAN,
+    "lastName" TEXT,
+    "migraine" BOOLEAN,
     "respiDisorder" BOOLEAN,
+    "weight" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -31,9 +31,9 @@ CREATE TABLE "Appointment" (
     "patientId" INTEGER NOT NULL,
     "doctorId" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "time" TEXT NOT NULL,
     "notes" TEXT,
     "status" TEXT NOT NULL DEFAULT 'scheduled',
+    "time" TEXT NOT NULL,
 
     CONSTRAINT "Appointment_pkey" PRIMARY KEY ("id")
 );
@@ -41,8 +41,8 @@ CREATE TABLE "Appointment" (
 -- CreateTable
 CREATE TABLE "Medication" (
     "id" SERIAL NOT NULL,
-    "type" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
     "abbreviation" TEXT NOT NULL,
 
     CONSTRAINT "Medication_pkey" PRIMARY KEY ("id")
@@ -53,10 +53,11 @@ CREATE TABLE "PatientMedication" (
     "id" SERIAL NOT NULL,
     "patientId" INTEGER NOT NULL,
     "medicationId" INTEGER NOT NULL,
-    "name" TEXT,
     "dose" TEXT,
     "interval" TEXT,
-    "startDate" TIMESTAMP(3),
+    "presentation" TEXT,
+    "abbreviation" TEXT,
+    "name" TEXT,
 
     CONSTRAINT "PatientMedication_pkey" PRIMARY KEY ("id")
 );
@@ -65,12 +66,12 @@ CREATE TABLE "PatientMedication" (
 CREATE TABLE "Study" (
     "id" SERIAL NOT NULL,
     "patientId" INTEGER NOT NULL,
-    "dateEEG" TIMESTAMP(3),
-    "dateRMNC" TIMESTAMP(3),
-    "dateNSMAP" TIMESTAMP(3),
-    "resEEG" TEXT,
-    "resRMNC" TEXT,
-    "resNSMAP" TEXT,
+    "dateEEG" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "dateNSMAP" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "dateRMNC" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "resEEG" TEXT DEFAULT 'No Realizado',
+    "resNSMAP" TEXT DEFAULT 'No Realizado',
+    "resRMNC" TEXT DEFAULT 'No Realizado',
 
     CONSTRAINT "Study_pkey" PRIMARY KEY ("id")
 );
@@ -83,6 +84,7 @@ CREATE TABLE "Crisis" (
     "duration" INTEGER,
     "recuperation" INTEGER,
     "unconscius" BOOLEAN,
+    "medication" TEXT,
 
     CONSTRAINT "Crisis_pkey" PRIMARY KEY ("id")
 );
@@ -94,10 +96,10 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PatientMedication" ADD CONSTRAINT "PatientMedication_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PatientMedication" ADD CONSTRAINT "PatientMedication_medicationId_fkey" FOREIGN KEY ("medicationId") REFERENCES "Medication"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PatientMedication" ADD CONSTRAINT "PatientMedication_medicationId_fkey" FOREIGN KEY ("medicationId") REFERENCES "Medication"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PatientMedication" ADD CONSTRAINT "PatientMedication_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Study" ADD CONSTRAINT "Study_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
