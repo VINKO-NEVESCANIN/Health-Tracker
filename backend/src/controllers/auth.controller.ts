@@ -4,23 +4,25 @@ import jwt from "jsonwebtoken";
 import prisma from "../config/db";
 import { hashPassword, comparePassword } from "../utils/hash";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret_dev";
+import { JWT_SECRET, ALLOW_ROLE_SIGNUP } from "../config/env";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { firstName, email, password, role } = req.body;
     if (!firstName || !email || !password) return res.status(400).json({ error: "Faltan datos" });
+    if (String(password).length < 8) return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres" });
 
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) return res.status(400).json({ error: "Email ya registrado" });
 
     const hashed = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { firstName, email, password: hashed, role: role || "Paciente" },
+      // El registro público siempre crea pacientes. Los doctores se crean con `npm run create-user`.
+      data: { firstName, email, password: hashed, role: ALLOW_ROLE_SIGNUP && role ? role : "Paciente" },
     });
 
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-    res.json({ user: { id: user.id, firstName: user.firstName, password: user.password, email: user.email, role: user.role}, token });
+    res.json({ user: { id: user.id, firstName: user.firstName, email: user.email, role: user.role, firstTime: user.firstTime }, token });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: "Error en registro" });

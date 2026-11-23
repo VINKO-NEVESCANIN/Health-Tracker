@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createPatient } from "@services/api";
 import { useAuth } from "@context/auth";
 import { theme, shadow } from "@constants/theme";
+import KeyboardScreen from "@components/KeyboardScreen";
 
 export default function AgregarPaciente() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function AgregarPaciente() {
   };
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <KeyboardScreen style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={20} color={theme.purple600} />
@@ -76,7 +77,7 @@ export default function AgregarPaciente() {
           {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Guardar Paciente</Text>}
         </Pressable>
       </View>
-    </ScrollView>
+    </KeyboardScreen>
   );
 }
 

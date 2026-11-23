@@ -71,9 +71,11 @@ export const getMyAppointments = async (req: any, res: Response) => {
   }
 };
 
-export const updateAppointment = async (req: Request, res: Response) => {
+export const updateAppointment = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
+    const own = await prisma.appointment.findUnique({ where: { id } });
+    if (!own || own.doctorId !== req.userId) return res.status(403).json({ error: "Acceso denegado" });
     const { date, notes, time, status } = req.body;
     const appointment = await prisma.appointment.update({
       where: { id },
@@ -91,9 +93,11 @@ export const updateAppointment = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteAppointment = async (req: Request, res: Response) => {
+export const deleteAppointment = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
+    const own = await prisma.appointment.findUnique({ where: { id } });
+    if (!own || own.doctorId !== req.userId) return res.status(403).json({ error: "Acceso denegado" });
     await prisma.appointment.delete({ where: { id } });
     res.json({ ok: true });
   } catch (err) {

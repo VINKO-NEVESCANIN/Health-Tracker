@@ -20,6 +20,7 @@ import {
   deleteAppointment,
 } from "@services/api";
 import { theme, shadow } from "@constants/theme";
+import KeyboardScreen from "@components/KeyboardScreen";
 
 interface Patient {
   id: number;
@@ -113,7 +114,7 @@ export default function EditarCita() {
   if (loading) return <ActivityIndicator size="large" color={theme.purple600} style={{ marginTop: 48 }} />;
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <KeyboardScreen style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.label}>Paciente</Text>
       <View style={styles.chips}>
         {patients.length === 0 && <Text style={styles.hint}>No hay pacientes registrados.</Text>}
@@ -189,7 +190,7 @@ export default function EditarCita() {
         }}
         onCancel={() => setShowHora(false)}
       />
-    </ScrollView>
+    </KeyboardScreen>
   );
 }
 

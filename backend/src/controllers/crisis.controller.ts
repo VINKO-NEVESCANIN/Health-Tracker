@@ -1,11 +1,13 @@
 // src/controllers/crisis.controller.ts
 import { Request, Response } from "express";
 import prisma from "../config/db";
+import { canAccessPatient } from "../middleware/access";
 
-export const createCrisis = async (req: Request, res: Response) => {
+export const createCrisis = async (req: any, res: Response) => {
   try {
     const { patientId, date, duration, recuperation, unconscius, medication } = req.body;
     if (!patientId) return res.status(400).json({ error: "patientId requerido" });
+    if (!canAccessPatient(req, Number(patientId))) return res.status(403).json({ error: "Acceso denegado" });
 
     const crisis = await prisma.crisis.create({
       data: {

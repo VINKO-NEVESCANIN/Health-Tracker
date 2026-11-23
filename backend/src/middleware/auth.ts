@@ -1,8 +1,7 @@
 // src/middleware/auth.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "secret_dev";
+import { JWT_SECRET } from "../config/env";
 
 export const authMiddleware = (roles: string[] = []) => {
   return (req: any, res: Response, next: NextFunction) => {

@@ -16,6 +16,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { getUserById, updateInfo } from "@services/api";
 import { useAuth } from "@context/auth";
 import { theme, shadow } from "@constants/theme";
+import KeyboardScreen from "@components/KeyboardScreen";
 
 const GENDERS = ["Masculino", "Femenino", "Otro"];
 const EPILEPSY_TYPES = ["Focal", "Generalizada", "Focal y generalizada", "Desconocida"];
@@ -144,7 +145,7 @@ export default function EditarPaciente() {
   );
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <KeyboardScreen style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Stack.Screen
         options={{
           title: isSelf && firstTime ? "Completa tu perfil" : "Editar paciente",
@@ -213,7 +214,7 @@ export default function EditarPaciente() {
         }}
         onCancel={() => setPicker(null)}
       />
-    </ScrollView>
+    </KeyboardScreen>
   );
 }
 

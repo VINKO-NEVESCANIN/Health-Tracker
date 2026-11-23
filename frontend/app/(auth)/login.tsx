@@ -6,7 +6,7 @@ import {
   Pressable,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform,
+  ScrollView,
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -66,10 +66,12 @@ export default function LoginScreen() {
       colors={[colors.gradientFrom, colors.gradientTo]}
       style={styles.gradient}
     >
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+       <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+       >
         <View style={styles.card}>
           <View style={styles.logoCircle}>
             <Ionicons name="person" size={40} color="#fff" />
@@ -122,6 +124,7 @@ export default function LoginScreen() {
             )}
           </Pressable>
         </View>
+       </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -129,7 +132,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
-  container: { flex: 1, justifyContent: "center", paddingHorizontal: 20 },
+  container: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 20, paddingVertical: 24 },
   card: {
     backgroundColor: "#fff",
     borderRadius: 28,

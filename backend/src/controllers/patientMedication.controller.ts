@@ -1,11 +1,13 @@
 // src/controllers/patientMedication.controller.ts
 import { Request, Response } from "express";
 import prisma from "../config/db";
+import { canAccessPatient } from "../middleware/access";
 
-export const createPatientMedication = async (req: Request, res: Response) => {
+export const createPatientMedication = async (req: any, res: Response) => {
   try {
     const { patientId, medicationId, dose, interval, name, presentation, abbreviation } = req.body;
     if (!patientId || !medicationId) return res.status(400).json({ error: "patientId y medicationId requeridos" });
+    if (!canAccessPatient(req, Number(patientId))) return res.status(403).json({ error: "Acceso denegado" });
 
     const pm = await prisma.patientMedication.create({
       data: {
@@ -43,9 +45,12 @@ export const getPatientMedications = async (req: Request, res: Response) => {
   }
 };
 
-export const deletePatientMedication = async (req: Request, res: Response) => {
+export const deletePatientMedication = async (req: any, res: Response) => {
   try {
     const id = Number(req.params.id);
+    const pm = await prisma.patientMedication.findUnique({ where: { id } });
+    if (!pm) return res.status(404).json({ error: "No encontrado" });
+    if (!canAccessPatient(req, pm.patientId)) return res.status(403).json({ error: "Acceso denegado" });
     await prisma.patientMedication.delete({ where: { id } });
     res.json({ ok: true });
   } catch (err) {

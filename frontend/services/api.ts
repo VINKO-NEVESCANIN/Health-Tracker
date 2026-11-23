@@ -1,9 +1,9 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ⚠️ Usa la IP de tu máquina en la red local, no "localhost" (Expo Go corre en el celular)
-// TODO: mover a variable de entorno (app.config.ts / EAS) antes de compilar para producción.
-export const API_URL = "http://192.168.50.171:4000";
+// La URL del backend viene de EXPO_PUBLIC_API_URL (archivo .env en desarrollo, eas.json en las compilaciones).
+// En desarrollo con Expo Go usa la IP de tu PC en la red local (no "localhost"); en producción, la URL HTTPS del servidor.
+export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.100.35:4000";
 
 const api = axios.create({ baseURL: API_URL });
 

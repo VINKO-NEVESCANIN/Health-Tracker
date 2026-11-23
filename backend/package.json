@@ -4,14 +4,15 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "seed": "ts-node prisma/seed.ts"
-  },
+   "dev": "nodemon --watch src --exec ts-node src/server.ts",
+  "build": "prisma generate && tsc",
+  "start": "node dist/server.js",
+  "start:prod": "prisma migrate deploy && node dist/server.js",
+  "create-user": "ts-node src/scripts/createUser.ts",
+  "prisma:generate": "prisma generate",
+  "prisma:migrate": "prisma migrate dev",
+  "prisma:studio": "prisma studio"
+},
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
