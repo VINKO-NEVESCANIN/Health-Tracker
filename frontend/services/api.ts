@@ -5,7 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // En desarrollo con Expo Go usa la IP de tu PC en la red local (no "localhost"); en producción, la URL HTTPS del servidor.
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.100.35:4000";
 
-const api = axios.create({ baseURL: API_URL });
+// 60 s: el servidor gratuito de Render tarda en despertar tras un rato sin uso
+const api = axios.create({ baseURL: API_URL, timeout: 60000 });
 
 // Adjunta el token guardado a cada request automáticamente
 api.interceptors.request.use(async (config) => {

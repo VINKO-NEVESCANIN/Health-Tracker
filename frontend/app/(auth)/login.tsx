@@ -13,6 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuth } from "@context/auth";
+import { API_URL } from "@services/api";
 
 // Colores tomados del diseño de Figma (paleta morada)
 const colors = {
@@ -53,8 +54,10 @@ export default function LoginScreen() {
         router.replace("/(protected)/home");
       }
     } catch (err: any) {
-      const msg =
-        err?.response?.data?.error ?? "No se pudo iniciar sesión. Verifica tus datos.";
+      // Sin respuesta del servidor = problema de conexión, no de credenciales
+      const msg = err?.response
+        ? err.response.data?.error ?? `El servidor respondió con error (${err.response.status}).`
+        : `No se pudo conectar con el servidor (${API_URL}). Revisa tu conexión y vuelve a intentar.`;
       setError(msg);
     } finally {
       setLoading(false);
