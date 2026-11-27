@@ -13,12 +13,12 @@
     "preview": {
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://TU-API.onrender.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://health-tracker-xs4w.onrender.com" }
     },
     "production": {
       "autoIncrement": true,
       "android": { "buildType": "app-bundle" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://TU-API.onrender.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://health-tracker-xs4w.onrender.com" }
     }
   },
   "submit": {
